@@ -1,16 +1,16 @@
-package com.mambu.xbml.shared;
+package com.mambu.xbrl.shared;
 
-import static com.mambu.xbml.shared.Namespace.*;
-import static com.mambu.xbml.shared.ElementType.*;
-import static com.mambu.xbml.shared.PeriodType.*;
-import static com.mambu.xbml.shared.ElementCategory.*;
+import static com.mambu.xbrl.shared.ElementCategory.*;
+import static com.mambu.xbrl.shared.ElementType.*;
+import static com.mambu.xbrl.shared.Namespace.*;
+import static com.mambu.xbrl.shared.PeriodType.*;
 /**
- * The XBML Elements which can be added and generated
+ * The XBRL Elements which can be added and generated
  * 
  * @author edanilkis
  * 
  */
-public enum XBMLElement {
+public enum XBRLElement {
 
 	CURRENT_TAX_ASSETS(IFRS, "CurrentTaxAssets", MONEY, INSTANT, BALANCE_SHEET),
 	CURRENT_TAX_EXPENSE_INCOME(IFRS, "CurrentTaxExpenseIncome", MONEY, DURATION, BALANCE_SHEET),
@@ -29,7 +29,7 @@ public enum XBMLElement {
 	private Namespace namespace;
 
 
-	private XBMLElement(Namespace namespace, String name, ElementType type, PeriodType period, ElementCategory category) {
+	private XBRLElement(Namespace namespace, String name, ElementType type, PeriodType period, ElementCategory category) {
 		this.namespace = namespace;
 		this.name = name;
 		this.type = type;

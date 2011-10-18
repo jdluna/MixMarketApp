@@ -1,7 +1,7 @@
-package com.mambu.xbml.shared;
+package com.mambu.xbrl.shared;
 
 /**
- * Summary of the namesapces used in the XBML report
+ * Summary of the namesapces used in the XBRL report
  * 
  * @author edanilkis
  * 

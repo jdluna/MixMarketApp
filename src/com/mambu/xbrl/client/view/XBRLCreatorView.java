@@ -1,4 +1,4 @@
-package com.mambu.xbml.client.view;
+package com.mambu.xbrl.client.view;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,21 +24,21 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
-import com.mambu.xbml.client.XMBLProcessService;
-import com.mambu.xbml.client.XMBLProcessServiceAsync;
-import com.mambu.xbml.shared.RequestSetttings;
-import com.mambu.xbml.shared.ElementCategory;
-import com.mambu.xbml.shared.XBMLElement;
+import com.mambu.xbrl.client.XBRLProcessService;
+import com.mambu.xbrl.client.XBRLProcessServiceAsync;
+import com.mambu.xbrl.shared.ElementCategory;
+import com.mambu.xbrl.shared.RequestSetttings;
+import com.mambu.xbrl.shared.XBRLElement;
 
-public class XBMLCreatorView extends Composite implements HasRequestSettings {
+public class XBRLCreatorView extends Composite implements HasRequestSettings {
 
-	private final XMBLProcessServiceAsync processService = GWT.create(XMBLProcessService.class);
+	private final XBRLProcessServiceAsync processService = GWT.create(XBRLProcessService.class);
 
 	
-	private static XBMLCreatorViewUiBinder uiBinder = GWT.create(XBMLCreatorViewUiBinder.class);
+	private static XBRLCreatorViewUiBinder uiBinder = GWT.create(XBRLCreatorViewUiBinder.class);
 	
 	@UiField TabLayoutPanel tabPanel;
-	@UiField TextArea xbmlOutput;
+	@UiField TextArea XBRLOutput;
 	@UiField Button executeButton;
 	@UiField HTMLPanel outputPanel;
 	
@@ -49,16 +49,16 @@ public class XBMLCreatorView extends Composite implements HasRequestSettings {
 	DateBox fromDate, toDate;
 
 	HashMap<ElementCategory, FlowPanel> categoryTabMap = new HashMap<ElementCategory, FlowPanel>();
-	List<XBMLElementWidget> elementWidgets = new ArrayList<XBMLElementWidget>();
+	List<XBRLElementWidget> elementWidgets = new ArrayList<XBRLElementWidget>();
 	
 	final DialogBox dialogBox = new DialogBox();
 	Label dialogLabel = new Label();
 
 
-	interface XBMLCreatorViewUiBinder extends UiBinder<Widget, XBMLCreatorView> {
+	interface XBRLCreatorViewUiBinder extends UiBinder<Widget, XBRLCreatorView> {
 	}
 
-	public XBMLCreatorView() {
+	public XBRLCreatorView() {
 		initWidget(uiBinder.createAndBindUi(this));
 		
 		//create the dialog box
@@ -84,11 +84,11 @@ public class XBMLCreatorView extends Composite implements HasRequestSettings {
 	}
 	
 	/**
-	 * Populates the tabs with the XBML Element as they are defined
+	 * Populates the tabs with the XBRL Element as they are defined
 	 */
 	private void populateElements() {
 		
-		for (XBMLElement element : XBMLElement.values()) {
+		for (XBRLElement element : XBRLElement.values()) {
 			//skip those not part of any category
 			if (element.getCategory() == null) {
 				continue;
@@ -98,7 +98,7 @@ public class XBMLCreatorView extends Composite implements HasRequestSettings {
 			FlowPanel flowPanel = categoryTabMap.get(element.getCategory());
 			
 			//create the widget and add it to the panel
-			XBMLElementWidget elementWidget = new XBMLElementWidget(element);
+			XBRLElementWidget elementWidget = new XBRLElementWidget(element);
 			elementWidget.setRequestController(this);
 			flowPanel.add(elementWidget);
 			
@@ -142,14 +142,14 @@ public class XBMLCreatorView extends Composite implements HasRequestSettings {
 	void onExecuteButtonClick(ClickEvent event) {
 		
 		//get the values
-		LinkedHashMap<XBMLElement, String> values = getXBMLValues();
+		LinkedHashMap<XBRLElement, String> values = getXBRLValues();
 		
 		processService.generateXML(getRequestSettings(), values, new AsyncCallback<String>() {
 			
 			@Override
 			public void onSuccess(String result) {
 				outputPanel.setVisible(true);
-				xbmlOutput.setText(result);
+				XBRLOutput.setText(result);
 			}
 			
 			@Override
@@ -161,16 +161,16 @@ public class XBMLCreatorView extends Composite implements HasRequestSettings {
 	}
 
 	/**
-	 * Gets the XBML Values from the widget
+	 * Gets the XBRL Values from the widget
 	 * @return
 	 */
-	private LinkedHashMap<XBMLElement, String> getXBMLValues() {
-		LinkedHashMap<XBMLElement, String> values = new LinkedHashMap<XBMLElement, String>();
+	private LinkedHashMap<XBRLElement, String> getXBRLValues() {
+		LinkedHashMap<XBRLElement, String> values = new LinkedHashMap<XBRLElement, String>();
 		
-		for (XBMLElementWidget widget : elementWidgets) {
-			XBMLElement xbmlElemenet = widget.getXBMLElemenet();
+		for (XBRLElementWidget widget : elementWidgets) {
+			XBRLElement XBRLElemenet = widget.getXBRLElemenet();
 			String value = widget.getValue();
-			values.put(xbmlElemenet, value);
+			values.put(XBRLElemenet, value);
 		}
 		
 		return values;

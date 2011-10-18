@@ -1,4 +1,4 @@
-package com.mambu.xbml.server;
+package com.mambu.xbrl.server;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -6,8 +6,8 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import com.mambu.xbml.shared.Namespace;
-import com.mambu.xbml.shared.XBMLElement;
+import com.mambu.xbrl.shared.Namespace;
+import com.mambu.xbrl.shared.XBRLElement;
 
 import nu.xom.Attribute;
 import nu.xom.Document;
@@ -15,7 +15,7 @@ import nu.xom.Element;
 import nu.xom.NodeFactory;
 import nu.xom.Serializer;
 
-public class XBMLGenerator {
+public class XBRLGenerator {
 
 	private static String DATE_FORMAT = "yyyy-MM-dd";
 	
@@ -26,7 +26,7 @@ public class XBMLGenerator {
 	private Document doc;
 	private Element root;
 
-	public XBMLGenerator() {
+	public XBRLGenerator() {
 		root = generateRoot();
 
 		doc = new Document(root);
@@ -38,12 +38,12 @@ public class XBMLGenerator {
 	}
 
 	/**
-	 * Adds an XBML Element to the sheet
+	 * Adds an XBRL Element to the sheet
 	 * 
 	 * @param element
 	 * @param value
 	 */
-	public void addElement(XBMLElement element, BigDecimal value) {
+	public void addElement(XBRLElement element, BigDecimal value) {
 
 		// create the element
 		Element xmlElement = new Element(element.getFullName(), element.getNamespace().getUrl());
@@ -63,7 +63,7 @@ public class XBMLGenerator {
 	 * @param element
 	 * @return
 	 */
-	private String getUnitRef(XBMLElement element) {
+	private String getUnitRef(XBRLElement element) {
 
 		switch (element.getType()) {
 		case AMOUNT:
@@ -135,7 +135,7 @@ public class XBMLGenerator {
 	 */
 	private Element generateRoot() {
 		Element root = new Element("xbrl");
-		root.appendChild(new NodeFactory().makeComment("Created by The Mambu XBML Tool on " + new Date().toString())
+		root.appendChild(new NodeFactory().makeComment("Created by The Mambu XBRL Tool on " + new Date().toString())
 				.get(0));
 
 		// add the namespaces

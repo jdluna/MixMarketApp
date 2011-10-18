@@ -1,4 +1,4 @@
-package com.mambu.xbml.shared;
+package com.mambu.xbrl.shared;
 
 public enum ElementType {
 

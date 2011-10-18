@@ -1,4 +1,4 @@
-package com.mambu.xbml.server;
+package com.mambu.xbrl.server;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -15,16 +15,16 @@ import com.mambu.accounting.shared.model.GLAccount;
 import com.mambu.apisdk.MambuAPIFactory;
 import com.mambu.apisdk.MambuAPIService;
 import com.mambu.apisdk.exception.MambuApiException;
-import com.mambu.xbml.client.XMBLProcessService;
-import com.mambu.xbml.shared.RequestSetttings;
-import com.mambu.xbml.shared.XBMLElement;
+import com.mambu.xbrl.client.XBRLProcessService;
+import com.mambu.xbrl.shared.RequestSetttings;
+import com.mambu.xbrl.shared.XBRLElement;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
  * The server side implementation of the RPC service.
  */
 @SuppressWarnings("serial")
-public class XMBLProcessServiceImpl extends RemoteServiceServlet implements XMBLProcessService {
+public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRLProcessService {
 
 	private final static ScriptEngine SCRIPT_ENGINE = new ScriptEngineManager().getEngineByName("JavaScript");
 
@@ -145,7 +145,7 @@ public class XMBLProcessServiceImpl extends RemoteServiceServlet implements XMBL
 	 * Generates the xml for a given connection with the specified inputs
 	 */
 	@Override
-	public String generateXML(RequestSetttings conn, LinkedHashMap<XBMLElement, String> values) {
+	public String generateXML(RequestSetttings conn, LinkedHashMap<XBRLElement, String> values) {
 
 		MambuAPIService mambu;
 		try {
@@ -159,10 +159,10 @@ public class XMBLProcessServiceImpl extends RemoteServiceServlet implements XMBL
 		String generatedXML = "";
 
 		try {
-			XBMLGenerator xbmlGenerator = new XBMLGenerator();
+			XBRLGenerator XBRLGenerator = new XBRLGenerator();
 
 			// now process the inputs
-			for (Entry<XBMLElement, String> entryValues : values.entrySet()) {
+			for (Entry<XBRLElement, String> entryValues : values.entrySet()) {
 
 				//skip empties
 				if (entryValues.getValue() == null || entryValues.getValue().isEmpty()) {
@@ -172,11 +172,11 @@ public class XMBLProcessServiceImpl extends RemoteServiceServlet implements XMBL
 				BigDecimal processInputstring = processInputstring(mambu, entryValues.getValue());
 
 				// add to the xml
-				xbmlGenerator.addElement(entryValues.getKey(), processInputstring);
+				XBRLGenerator.addElement(entryValues.getKey(), processInputstring);
 
 			}
 
-			generatedXML = xbmlGenerator.generate();
+			generatedXML = XBRLGenerator.generate();
 
 		} catch (Exception e) {
 			e.printStackTrace();

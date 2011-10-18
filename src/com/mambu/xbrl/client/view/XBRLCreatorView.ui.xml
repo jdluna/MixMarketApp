@@ -2,7 +2,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:dp="urn:import:com.google.gwt.user.datepicker.client"
-	xmlns:my="urn:import:com.mambu.xbml.client.view">
+	xmlns:my="urn:import:com.mambu.xbrl.client.view">
 	<ui:style>
 	
 		.important {
@@ -76,7 +76,7 @@
 		
 	</ui:style>
 	<g:HTMLPanel styleName="{style.panel}">
-		<h1><g:Image url="http://www.blog.jbi.in/wp-content/uploads/2008/11/xml-icon.gif" height="55px" styleName="{style.logo}"/>Mambu XBML Export Tool</h1>
+		<h1><g:Image url="http://www.blog.jbi.in/wp-content/uploads/2008/11/xml-icon.gif" height="55px" styleName="{style.logo}"/>Mambu XBRL Export Tool</h1>
 
 		<h2>Mambu Connection</h2>
 
@@ -107,13 +107,13 @@
 
 		<g:TabLayoutPanel barHeight="2" barUnit="EM" height="100px" animationVertical="true" ui:field="tabPanel"/>
 		
-		<g:Button ui:field="executeButton" styleName="{style.executeButton}">Preview XBML</g:Button>
+		<g:Button ui:field="executeButton" styleName="{style.executeButton}">Preview XBRL</g:Button>
 		
 
 		<g:HTMLPanel ui:field="outputPanel">
 			<h2>XBRL Output</h2>	
 		
-			<g:TextArea ui:field="xbmlOutput" width="100%" height="200px" styleName="{style.xbmloutput}"/>
+			<g:TextArea ui:field="XBRLOutput" width="100%" height="200px" styleName="{style.xbmloutput}"/>
 		</g:HTMLPanel>
 		
 		<h1/>

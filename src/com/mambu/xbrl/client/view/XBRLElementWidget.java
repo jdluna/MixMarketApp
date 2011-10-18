@@ -1,4 +1,4 @@
-package com.mambu.xbml.client.view;
+package com.mambu.xbrl.client.view;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -15,18 +15,18 @@ import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.mambu.xbml.client.XMBLProcessService;
-import com.mambu.xbml.client.XMBLProcessServiceAsync;
-import com.mambu.xbml.shared.XBMLElement;
+import com.mambu.xbrl.client.XBRLProcessService;
+import com.mambu.xbrl.client.XBRLProcessServiceAsync;
+import com.mambu.xbrl.shared.XBRLElement;
 
-public class XBMLElementWidget extends Composite {
+public class XBRLElementWidget extends Composite {
 
 	private static AccountWidgetUiBinder uiBinder = GWT.create(AccountWidgetUiBinder.class);
 
-	interface AccountWidgetUiBinder extends UiBinder<Widget, XBMLElementWidget> {
+	interface AccountWidgetUiBinder extends UiBinder<Widget, XBRLElementWidget> {
 	}
 
-	private final XMBLProcessServiceAsync processService = GWT.create(XMBLProcessService.class);
+	private final XBRLProcessServiceAsync processService = GWT.create(XBRLProcessService.class);
 
 	@UiField
 	Label label;
@@ -56,14 +56,14 @@ public class XBMLElementWidget extends Composite {
 	/**
 	 * The element being contained here
 	 */
-	XBMLElement element;
+	XBRLElement element;
 
 	/**
 	 * The parent object which has the request settings
 	 */
 	HasRequestSettings requestController;
 
-	public XBMLElementWidget() {
+	public XBRLElementWidget() {
 		initWidget(uiBinder.createAndBindUi(this));
 
 		dialogBox.setText("Remote Procedure Call");
@@ -73,14 +73,14 @@ public class XBMLElementWidget extends Composite {
 	}
 
 	public @UiConstructor
-	XBMLElementWidget(String elementName) {
+	XBRLElementWidget(String elementName) {
 		this();
-		element = XBMLElement.valueOf(elementName);
+		element = XBRLElement.valueOf(elementName);
 
 		this.label.setText(element.getName());
 	}
 
-	public XBMLElementWidget(XBMLElement elementName) {
+	public XBRLElementWidget(XBRLElement elementName) {
 		this(elementName.toString());
 	}
 	
@@ -135,10 +135,10 @@ public class XBMLElementWidget extends Composite {
 	}
 
 	/**
-	 * Returns the XBML element
+	 * Returns the XBRL element
 	 * @return
 	 */
-	public XBMLElement getXBMLElemenet() {
+	public XBRLElement getXBRLElemenet() {
 		return element;
 	}
 	

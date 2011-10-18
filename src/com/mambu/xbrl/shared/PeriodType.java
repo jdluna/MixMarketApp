@@ -1,4 +1,4 @@
-package com.mambu.xbml.shared;
+package com.mambu.xbrl.shared;
 
 /**
  * How the calculation is performed on the element

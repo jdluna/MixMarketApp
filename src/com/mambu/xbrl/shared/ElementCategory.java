@@ -1,7 +1,7 @@
-package com.mambu.xbml.shared;
+package com.mambu.xbrl.shared;
 
 /**
- * A category for various XBML elements used for organization purposes
+ * A category for various XBRL elements used for organization purposes
  * 
  * @author edanilkis
  * 
