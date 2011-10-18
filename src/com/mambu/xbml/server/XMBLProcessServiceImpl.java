@@ -16,7 +16,7 @@ import com.mambu.apisdk.MambuAPIFactory;
 import com.mambu.apisdk.MambuAPIService;
 import com.mambu.apisdk.exception.MambuApiException;
 import com.mambu.xbml.client.XMBLProcessService;
-import com.mambu.xbml.shared.ConnectionInfo;
+import com.mambu.xbml.shared.RequestSetttings;
 import com.mambu.xbml.shared.XBMLElement;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -31,13 +31,11 @@ public class XMBLProcessServiceImpl extends RemoteServiceServlet implements XMBL
 	/**
 	 * Processses a single xbrml request
 	 */
-	public String processRequest(ConnectionInfo conn, String input) throws IllegalArgumentException {
+	public String processRequest(RequestSetttings conn, String input) throws IllegalArgumentException {
 
 		MambuAPIService mambu;
 		try {
-			mambu = MambuAPIFactory.crateService("apied", "apied", "demo.mambuonline.com");
-			mambu.setProtocol("http");
-
+			mambu = createService(conn);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new IllegalArgumentException(e.getMessage());
@@ -48,6 +46,12 @@ public class XMBLProcessServiceImpl extends RemoteServiceServlet implements XMBL
 		return processInputstring.stripTrailingZeros().toPlainString();
 	}
 
+	/**
+	 * Processes an individual input string
+	 * @param mambu
+	 * @param input
+	 * @return
+	 */
 	private BigDecimal processInputstring(MambuAPIService mambu, String input) {
 		String oriString = new String(input);
 
@@ -141,12 +145,11 @@ public class XMBLProcessServiceImpl extends RemoteServiceServlet implements XMBL
 	 * Generates the xml for a given connection with the specified inputs
 	 */
 	@Override
-	public String generateXML(ConnectionInfo conn, LinkedHashMap<XBMLElement, String> values) {
+	public String generateXML(RequestSetttings conn, LinkedHashMap<XBMLElement, String> values) {
 
 		MambuAPIService mambu;
 		try {
-			mambu = MambuAPIFactory.crateService("apied", "apied", "demo.mambuonline.com");
-			mambu.setProtocol("http");
+			mambu = createService(conn);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -161,6 +164,11 @@ public class XMBLProcessServiceImpl extends RemoteServiceServlet implements XMBL
 			// now process the inputs
 			for (Entry<XBMLElement, String> entryValues : values.entrySet()) {
 
+				//skip empties
+				if (entryValues.getValue() == null || entryValues.getValue().isEmpty()) {
+					continue;
+				}
+				
 				BigDecimal processInputstring = processInputstring(mambu, entryValues.getValue());
 
 				// add to the xml
@@ -177,5 +185,18 @@ public class XMBLProcessServiceImpl extends RemoteServiceServlet implements XMBL
 		}
 
 		return generatedXML;
+	}
+
+	/**
+	 * Creates the API Service from the request settings
+	 * 
+	 * @param settings
+	 * @return
+	 * @throws MambuApiException
+	 */
+	private MambuAPIService createService(RequestSetttings settings) throws MambuApiException {
+		MambuAPIService mambu = MambuAPIFactory.crateService(settings.username, settings.password, settings.domain);
+		mambu.setProtocol("http");
+		return mambu;
 	}
 }

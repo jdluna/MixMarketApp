@@ -95,7 +95,6 @@ public class XBMLGenerator {
 		}
 
 		String result = sos.toString();
-		System.out.println(result);
 		return result;
 	}
 

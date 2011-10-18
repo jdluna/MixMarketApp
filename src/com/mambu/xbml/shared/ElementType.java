@@ -4,5 +4,11 @@ public enum ElementType {
 
 	MONEY,
 	
-	AMOUNT
+	AMOUNT,
+	
+	DATE,
+	
+	STRING,
+	
+	INTEGER
 }

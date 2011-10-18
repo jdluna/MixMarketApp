@@ -2,17 +2,17 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
 	
-	<ui:style type="com.mambu.xbml.client.view.AccountWidget.MyStyle">
+	<ui:style type="com.mambu.xbml.client.view.XBMLElementWidget.MyStyle">
 		
 		.label {
-			color: #999;
+			color: #597565;
 			float: left;
 			margin-right: 10px;
 		}
 		
 		.value, .valueComputed , .valueError {
 			padding: 2px;
-			color: darkBlue;
+			color: #00223f;
 			font-weight: bold;
 			float: left;
 			border: 1px solid #999;
@@ -20,9 +20,13 @@
 			font-size: 110%;
 		}
 		
+		.value:FOCUS{
+			border: 1px solid black;	
+		}
+		
 		.valueComputed {
 			color: white;
-			background-color: darkBlue;
+			background-color: #8AB131;
 			text-align: center;	
 		}
 		
@@ -31,8 +35,15 @@
 			background: white;
 			border: 1px solid red;	
 		}
+		
+		.holder {
+			display: inline;
+			float: left;	
+			padding: 5px;
+			margin-right: 10px;
+		}
 	</ui:style>
-	<g:HTMLPanel>
+	<g:HTMLPanel styleName="{style.holder}">
 			<g:Label ui:field="label" styleName="{style.label}"/><br/>
 			<g:TextBox ui:field="value" styleName="{style.value}"/>
 	</g:HTMLPanel>

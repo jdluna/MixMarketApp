@@ -19,11 +19,11 @@ import com.mambu.xbml.client.XMBLProcessService;
 import com.mambu.xbml.client.XMBLProcessServiceAsync;
 import com.mambu.xbml.shared.XBMLElement;
 
-public class AccountWidget extends Composite {
+public class XBMLElementWidget extends Composite {
 
 	private static AccountWidgetUiBinder uiBinder = GWT.create(AccountWidgetUiBinder.class);
 
-	interface AccountWidgetUiBinder extends UiBinder<Widget, AccountWidget> {
+	interface AccountWidgetUiBinder extends UiBinder<Widget, XBMLElementWidget> {
 	}
 
 	private final XMBLProcessServiceAsync processService = GWT.create(XMBLProcessService.class);
@@ -48,10 +48,22 @@ public class AccountWidget extends Composite {
 	final DialogBox dialogBox = new DialogBox();
 	Label dialogLabel = new Label();
 
+	/**
+	 * Current expression being evaluated. Stored as we also may show the actual computed value
+	 */
 	String valueExpression = "";
+	
+	/**
+	 * The element being contained here
+	 */
 	XBMLElement element;
 
-	public AccountWidget() {
+	/**
+	 * The parent object which has the request settings
+	 */
+	HasRequestSettings requestController;
+
+	public XBMLElementWidget() {
 		initWidget(uiBinder.createAndBindUi(this));
 
 		dialogBox.setText("Remote Procedure Call");
@@ -61,13 +73,17 @@ public class AccountWidget extends Composite {
 	}
 
 	public @UiConstructor
-	AccountWidget(String elementName) {
+	XBMLElementWidget(String elementName) {
 		this();
 		element = XBMLElement.valueOf(elementName);
 
 		this.label.setText(element.getName());
 	}
 
+	public XBMLElementWidget(XBMLElement elementName) {
+		this(elementName.toString());
+	}
+	
 	/**
 	 * Fired when the user types in the nameField.
 	 */
@@ -77,7 +93,7 @@ public class AccountWidget extends Composite {
 		valueExpression = value.getValue();
 
 		if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-			processService.processRequest(null, value.getValue(), new AsyncCallback<String>() {
+			processService.processRequest(requestController.getRequestSettings(), value.getValue(), new AsyncCallback<String>() {
 
 				@Override
 				public void onSuccess(String result) {
@@ -95,6 +111,10 @@ public class AccountWidget extends Composite {
 		}
 	}
 	
+	/**
+	 * Handles the click by resetting back to the value
+	 * @param e
+	 */
 	@UiHandler("value")
 	public void onClick(ClickEvent e){
 		if (valueExpression.isEmpty()) {
@@ -105,4 +125,33 @@ public class AccountWidget extends Composite {
 		value.setText(valueExpression);
 	}
 
+	/**
+	 * Sets the widget from which to retrieve the request settings
+	 * @param controller
+	 */
+	public void setRequestController(HasRequestSettings controller) {
+		this.requestController = controller;
+		
+	}
+
+	/**
+	 * Returns the XBML element
+	 * @return
+	 */
+	public XBMLElement getXBMLElemenet() {
+		return element;
+	}
+	
+	/**
+	 * Gets the element value expression
+	 * @return
+	 */
+	public String getValue() {
+		if (valueExpression.isEmpty()) {
+			valueExpression = value.getValue();
+		}
+		
+		return valueExpression;
+		
+	}
 }

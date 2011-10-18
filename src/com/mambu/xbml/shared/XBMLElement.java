@@ -1,5 +1,9 @@
 package com.mambu.xbml.shared;
 
+import static com.mambu.xbml.shared.Namespace.*;
+import static com.mambu.xbml.shared.ElementType.*;
+import static com.mambu.xbml.shared.PeriodType.*;
+import static com.mambu.xbml.shared.ElementCategory.*;
 /**
  * The XBML Elements which can be added and generated
  * 
@@ -8,29 +12,29 @@ package com.mambu.xbml.shared;
  */
 public enum XBMLElement {
 
-	ADMINISTRATIVE_EXPENSE(Namespace.IFRS, "AdministrativeExpense", ElementType.MONEY),
+	CURRENT_TAX_ASSETS(IFRS, "CurrentTaxAssets", MONEY, INSTANT, BALANCE_SHEET),
+	CURRENT_TAX_EXPENSE_INCOME(IFRS, "CurrentTaxExpenseIncome", MONEY, DURATION, BALANCE_SHEET),
+	CURRENT_TAX_LIABILITIES(IFRS, "CurrentTaxLiabilities", MONEY, INSTANT, BALANCE_SHEET),
 
-	DEPOSISTS(Namespace.IFRS, "Deposits", ElementType.MONEY, "The total value of funds placed in an account with an MFI that are payable to a depositor. This item includes any current, checking, or savings accounts that are payable on demand. It also includes time deposits which have a fixed maturity date.")
-
+	
+	NUMBER_DEPOSIT_ACCOUNTS(MIX,"NumberOfDepositAccounts", INTEGER, INSTANT, null),
+	NUMBER_OUTSANDING_LOANS(MIX,"NumberOfOutstandingLoans", INTEGER, INSTANT, null),
 	;
 
+	private ElementCategory category;
+	private PeriodType period;
 	private ElementType type;
 	private String name;
 	private String description;
 	private Namespace namespace;
 
-	private XBMLElement(Namespace namespace, String name, ElementType type, String description) {
-		this.type = type;
-		this.name = name;
-		this.namespace = namespace;
-		this.description = description;
 
-	}
-
-	private XBMLElement(Namespace namespace, String name, ElementType type) {
-		this.type = type;
-		this.name = name;
+	private XBMLElement(Namespace namespace, String name, ElementType type, PeriodType period, ElementCategory category) {
 		this.namespace = namespace;
+		this.name = name;
+		this.type = type;
+		this.period = period;
+		this.category = category;
 	}
 
 	public ElementType getType() {
@@ -51,6 +55,14 @@ public enum XBMLElement {
 	
 	public String getFullName() {;
 		return namespace.getPrefix() + ":" + name;
+	}
+
+	public ElementCategory getCategory() {
+		return category;
+	}
+
+	public PeriodType getPeriod() {
+		return period;
 	}
 
 }
