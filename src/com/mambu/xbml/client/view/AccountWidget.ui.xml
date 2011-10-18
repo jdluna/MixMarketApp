@@ -1,0 +1,39 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	
+	<ui:style type="com.mambu.xbml.client.view.AccountWidget.MyStyle">
+		
+		.label {
+			color: #999;
+			float: left;
+			margin-right: 10px;
+		}
+		
+		.value, .valueComputed , .valueError {
+			padding: 2px;
+			color: darkBlue;
+			font-weight: bold;
+			float: left;
+			border: 1px solid #999;
+			margin-right: 10px;
+			font-size: 110%;
+		}
+		
+		.valueComputed {
+			color: white;
+			background-color: darkBlue;
+			text-align: center;	
+		}
+		
+		.valueError {
+			color: red;
+			background: white;
+			border: 1px solid red;	
+		}
+	</ui:style>
+	<g:HTMLPanel>
+			<g:Label ui:field="label" styleName="{style.label}"/><br/>
+			<g:TextBox ui:field="value" styleName="{style.value}"/>
+	</g:HTMLPanel>
+</ui:UiBinder> 
