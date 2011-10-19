@@ -1,7 +1,9 @@
 
 gwt-unitCache/*
-war/*
-
+war/mambuxbrl/*
+war/WEB-INF/classes/*
+war/WEB-INF/deploy/*
 lib/.DS_Store
 
 .settings*
+
