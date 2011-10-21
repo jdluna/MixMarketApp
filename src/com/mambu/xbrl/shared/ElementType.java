@@ -6,5 +6,7 @@ public enum ElementType {
 	
 	AMOUNT,
 
-	INTEGER
+	INTEGER,
+	
+	STRING
 }

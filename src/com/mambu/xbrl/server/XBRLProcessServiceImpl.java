@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.jdo.PersistenceManager;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -19,7 +20,7 @@ import com.mambu.xbrl.client.XBRLProcessService;
 import com.mambu.xbrl.shared.Duration;
 import com.mambu.xbrl.shared.IndicatorElementMap;
 import com.mambu.xbrl.shared.PeriodType;
-import com.mambu.xbrl.shared.XBRLGenerationParamaters;
+import com.mambu.xbrl.shared.XBRLGenerationParameters;
 import com.mambu.xbrl.shared.XBRLElement;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -36,7 +37,7 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 	 */
 	
 	@Override
-	public String processRequest(XBRLGenerationParamaters params, XBRLElement element, String input) throws IllegalArgumentException {
+	public String processRequest(XBRLGenerationParameters params, XBRLElement element, String input) throws IllegalArgumentException {
 
 		MambuAPIService mambu = null;
 		try {
@@ -162,7 +163,7 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 	 * Generates the xml for a given connection with the specified inputs
 	 */
 	@Override
-	public String generateXML(XBRLGenerationParamaters params) {
+	public String generateXML(XBRLGenerationParameters params) {
 
 		MambuAPIService mambu;
 		try {
@@ -204,12 +205,19 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 	 * @param xBRLGenerator
 	 * @param params
 	 */
-	private void processXBRLFinancials(MambuAPIService mambu, XBRLGenerator xBRLGenerator, XBRLGenerationParamaters params) {
+	private void processXBRLFinancials(MambuAPIService mambu, XBRLGenerator xBRLGenerator, XBRLGenerationParameters params) {
 		for (Entry<XBRLElement, String> entryValues : params.values.entrySet()) {
 
 			XBRLElement key = entryValues.getKey();
 			//skip empties
 			if (entryValues.getValue() == null || entryValues.getValue().isEmpty()) {
+				continue;
+			}
+			
+			
+			//if it's not a number
+			if (key.getPeriod() == null) {
+				xBRLGenerator.addElement(key, entryValues.getValue());
 				continue;
 			}
 			
@@ -266,9 +274,44 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 	 * @return
 	 * @throws MambuApiException
 	 */
-	private MambuAPIService createService(XBRLGenerationParamaters settings) throws MambuApiException {
+	private MambuAPIService createService(XBRLGenerationParameters settings) throws MambuApiException {
 		MambuAPIService mambu = MambuAPIFactory.crateService(settings.username, settings.password, settings.domain);
 		mambu.setProtocol("http");
 		return mambu;
+	}
+
+	/**
+	 * Stores parameters
+	 */
+	@Override
+	public String storeParams(XBRLGenerationParameters params) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		params = pm.makePersistent(params);
+		pm.close();
+		
+		return params.getEncodedKey();
+		
+	}
+
+	/**
+	 * Retreives parameters
+	 */
+	@Override
+	public XBRLGenerationParameters getParams(String key) throws IllegalArgumentException {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		
+		try{
+			XBRLGenerationParameters paramaters = pm.getObjectById(XBRLGenerationParameters.class,key);
+			paramaters = pm.detachCopy(paramaters);
+			return paramaters;
+			
+		} catch (Exception e) {
+			throw new IllegalArgumentException(e);
+		} finally {
+			pm.close();
+
+		}		
+
+	
 	}
 }

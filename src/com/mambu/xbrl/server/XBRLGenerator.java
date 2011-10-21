@@ -79,6 +79,23 @@ public class XBRLGenerator {
 
 		root.appendChild(xmlElement);
 	}
+	
+	/**
+	 * Adds an XBRL Element to the sheet for a given instance
+	 * 
+	 * @param element
+	 * @param value
+	 */
+	public void addElement(XBRLElement element, String value) {
+
+		// create the element
+		Element xmlElement = new Element(element.getFullName(), element.getNamespace().getUrl());
+
+		// add the child
+		xmlElement.appendChild(value);
+
+		root.appendChild(xmlElement);
+	}
 
 	/**
 	 * Gets the unit reference for an element

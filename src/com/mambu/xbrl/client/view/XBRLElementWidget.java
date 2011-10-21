@@ -77,7 +77,19 @@ public class XBRLElementWidget extends Composite {
 		this();
 		element = XBRLElement.valueOf(elementName);
 
-		this.label.setText(element.getName());
+		String name = element.getName();
+		
+		//add spaces to the name
+		char[] charArray = name.toCharArray();
+		StringBuilder nameWithSpaces = new StringBuilder();
+		for (char c : charArray) {
+			if (Character.isUpperCase(c)) {
+				nameWithSpaces.append(" " + c);
+			} else {
+				nameWithSpaces.append(c);
+			}
+		}
+		this.label.setText(nameWithSpaces.toString());
 	}
 
 	public XBRLElementWidget(XBRLElement elementName) {
@@ -89,6 +101,11 @@ public class XBRLElementWidget extends Composite {
 	 */
 	@UiHandler("value")
 	public void onKeyUp(KeyUpEvent event) {
+		//nothing to do if no controller
+		if (requestController == null) {
+			return;	
+		}
+		
 		//store the current expression
 		valueExpression = value.getValue();
 

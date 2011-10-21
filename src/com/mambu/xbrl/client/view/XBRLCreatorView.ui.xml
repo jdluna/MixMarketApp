@@ -61,6 +61,13 @@
 		    padding: 3px;
 		}
 		
+		.mappingButton {
+			margin-top: 5px;
+		    padding: 3px;
+		    color: #333333;
+    		float: right;
+		}
+		
 		.xbmloutput {
 			border: 1px dotted #CCCCCC;
 		    color: #333333;
@@ -70,10 +77,40 @@
 			
 		}
 		
+		.dialogPanel{
+			width: auto;
+			text-align: center;	
+			font-weight: bold;
+			color: #333;
+		}
+		
 		.logo {
 			padding-right: 10px;	
 		}
 		
+		
+		.key, .getKey {
+			font-family: monospace;
+			font-weight: bold;
+			font-size: 120%;
+			text-align: center;	
+			width: 600px;
+			margin: 20px;
+			border: 2px solid gold; 
+			padding: 10px;
+			color: black;
+		}
+		
+		.getKey {
+			width: 600px;	
+			border: 1px solid #666; 
+			
+		}
+		
+		.error {
+			color: red;
+			font-weight: bold;	
+		}
 	</ui:style>
 	<g:HTMLPanel styleName="{style.panel}">
 		<h1><g:Image url="http://www.blog.jbi.in/wp-content/uploads/2008/11/xml-icon.gif" height="55px" styleName="{style.logo}"/>Mambu XBRL Export Tool</h1>
@@ -108,7 +145,8 @@
 		<g:TabLayoutPanel barHeight="2" barUnit="EM" height="100px" animationVertical="true" ui:field="tabPanel"/>
 		
 		<g:Button ui:field="executeButton" styleName="{style.executeButton}">Preview XBRL</g:Button>
-		
+		<g:Button ui:field="storeButton"  styleName="{style.mappingButton}">Store Mappings</g:Button>
+		<g:Button ui:field="loadButton"  styleName="{style.mappingButton}">Load Mappings</g:Button>
 
 		<g:HTMLPanel ui:field="outputPanel">
 			<h2>XBRL Output</h2>	
@@ -122,7 +160,24 @@
 			<g:Image url="http://www.mixmarket.org/sites/all/themes/mixm/logo.png" height="20px" styleName="{style.logo}"/>
 		
 		</g:HTMLPanel>
-			
 		
+		<g:DialogBox ui:field="storedDialog" addStyleNames="{style.dialogPanel}">
+			<g:HTMLPanel styleName="{style.dialogPanel}">
+				Your XBRL settings have been stored.<br/> The following is your unique key to retrieve them.
+				<g:Label ui:field="storedKeyValue" styleName="{style.key}"/>
+			</g:HTMLPanel>
+		</g:DialogBox>
+			
+		<g:DialogBox ui:field="loadDialog" addStyleNames="{style.dialogPanel}">
+			<g:HTMLPanel>
+				 Please enter your xbrl mapping key<br/>
+				 <g:TextBox ui:field="getXBRLMappingKey" styleName="{style.getKey}"/> <p/>
+				 <g:Label ui:field="storedKeyError" styleName="{style.error}">Unable to find any stored params with this key</g:Label>
+				 
+				 <g:Button ui:field="retrieveButton"  styleName="{style.mappingButton}">Load</g:Button>
+				 
+			</g:HTMLPanel>
+		</g:DialogBox>
+			
 	</g:HTMLPanel>
 </ui:UiBinder> 

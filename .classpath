@@ -12,7 +12,6 @@
 			<attribute name="javadoc_location" value="http://www.xom.nu/apidocs/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" path="shared"/>
 	<classpathentry kind="src" path=".apt_generated">
 		<attributes>
 			<attribute name="optional" value="true"/>

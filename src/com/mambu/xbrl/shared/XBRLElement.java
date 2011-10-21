@@ -19,6 +19,12 @@ public enum XBRLElement implements Serializable {
 	CURRENT_TAX_LIABILITIES(IFRS, "CurrentTaxLiabilities", MONEY, INSTANT, BALANCE_SHEET),
 
 	
+	//string
+	NAME_OF_ENTITY(IFRS,"NameOfReportingEntityOrOtherMeansOfIdentification", STRING, null, GENERAL),
+	LEGAL_ENTITY_FORM(IFRS, "LegalFormOfEntity", STRING, null, GENERAL),
+	POINTS_OF_SERVICE(IFRS, "NumberOfPointsOfService", INTEGER, INSTANT, GENERAL),
+
+	
 	NUMBER_DEPOSIT_ACCOUNTS(MIX,"NumberOfDepositAccounts", INTEGER, INSTANT, null),
 	NUMBER_OUTSANDING_LOANS(MIX,"NumberOfOutstandingLoans", INTEGER, INSTANT, null),
 	;
