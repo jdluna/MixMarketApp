@@ -93,7 +93,7 @@ public class XBRLElementWidget extends Composite {
 		valueExpression = value.getValue();
 
 		if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-			processService.processRequest(requestController.getRequestSettings(), value.getValue(), new AsyncCallback<String>() {
+			processService.processRequest(requestController.getRequestParams(), element, value.getValue(), new AsyncCallback<String>() {
 
 				@Override
 				public void onSuccess(String result) {
@@ -103,8 +103,9 @@ public class XBRLElementWidget extends Composite {
 
 				@Override
 				public void onFailure(Throwable caught) {
+					caught.printStackTrace();
 					value.setStyleName(style.valueError());
-					dialogLabel.setText(caught.getMessage());
+					dialogLabel.setText(caught.toString() + " : " +caught.getMessage());
 					dialogBox.center();
 				}
 			});

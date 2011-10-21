@@ -1,6 +1,6 @@
 package com.mambu.xbrl.client.view;
 
-import com.mambu.xbrl.shared.RequestSetttings;
+import com.mambu.xbrl.shared.XBRLGenerationParamaters;
 
 /**
  * Interface for the object which has the XBRL Request settings
@@ -9,5 +9,5 @@ import com.mambu.xbrl.shared.RequestSetttings;
  */
 public interface HasRequestSettings {
 
-	public RequestSetttings getRequestSettings();
+	public XBRLGenerationParamaters getRequestParams();
 }

@@ -4,13 +4,15 @@ import static com.mambu.xbrl.shared.ElementCategory.*;
 import static com.mambu.xbrl.shared.ElementType.*;
 import static com.mambu.xbrl.shared.Namespace.*;
 import static com.mambu.xbrl.shared.PeriodType.*;
+
+import java.io.Serializable;
 /**
  * The XBRL Elements which can be added and generated
  * 
  * @author edanilkis
  * 
  */
-public enum XBRLElement {
+public enum XBRLElement implements Serializable {
 
 	CURRENT_TAX_ASSETS(IFRS, "CurrentTaxAssets", MONEY, INSTANT, BALANCE_SHEET),
 	CURRENT_TAX_EXPENSE_INCOME(IFRS, "CurrentTaxExpenseIncome", MONEY, DURATION, BALANCE_SHEET),

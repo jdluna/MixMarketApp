@@ -2,7 +2,6 @@ package com.mambu.xbrl.server;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,8 +14,12 @@ import com.mambu.accounting.shared.model.GLAccount;
 import com.mambu.apisdk.MambuAPIFactory;
 import com.mambu.apisdk.MambuAPIService;
 import com.mambu.apisdk.exception.MambuApiException;
+import com.mambu.intelligence.shared.model.Intelligence.Indicator;
 import com.mambu.xbrl.client.XBRLProcessService;
-import com.mambu.xbrl.shared.RequestSetttings;
+import com.mambu.xbrl.shared.Duration;
+import com.mambu.xbrl.shared.IndicatorElementMap;
+import com.mambu.xbrl.shared.PeriodType;
+import com.mambu.xbrl.shared.XBRLGenerationParamaters;
 import com.mambu.xbrl.shared.XBRLElement;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -31,17 +34,24 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 	/**
 	 * Processses a single xbrml request
 	 */
-	public String processRequest(RequestSetttings conn, String input) throws IllegalArgumentException {
+	
+	@Override
+	public String processRequest(XBRLGenerationParamaters params, XBRLElement element, String input) throws IllegalArgumentException {
 
-		MambuAPIService mambu;
+		MambuAPIService mambu = null;
 		try {
-			mambu = createService(conn);
+			mambu = createService(params);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new IllegalArgumentException(e.getMessage());
 		}
 
-		BigDecimal processInputstring = processInputstring(mambu, input);
+		Duration duration = null;
+		if (element.getPeriod() ==  PeriodType.DURATION && params.durations.size() > 0) {
+			duration = params.durations.get(0);
+		}
+		
+		BigDecimal processInputstring = processInputString(mambu, input, duration);
 
 		return processInputstring.stripTrailingZeros().toPlainString();
 	}
@@ -52,7 +62,7 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 	 * @param input
 	 * @return
 	 */
-	private BigDecimal processInputstring(MambuAPIService mambu, String input) {
+	private BigDecimal processInputString(MambuAPIService mambu, String input, Duration duration) {
 		String oriString = new String(input);
 
 		// parse input
@@ -62,7 +72,7 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 			// get the balance
 			BigDecimal accountBalance;
 			try {
-				accountBalance = getAccountBalance(mambu, glCode);
+				accountBalance = getAccountBalance(mambu, glCode, duration);
 			} catch (MambuApiException e) {
 				System.out.println(e.getErrorMessage());
 				throw new IllegalArgumentException(e.getErrorMessage());
@@ -89,13 +99,20 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 	 * 
 	 * @param mambu
 	 * @param glCode
+	 * @param duration TODO
 	 * @return
 	 * @throws MambuApiException
 	 */
-	private BigDecimal getAccountBalance(MambuAPIService mambu, String glCode) throws MambuApiException {
+	private BigDecimal getAccountBalance(MambuAPIService mambu, String glCode, Duration duration) throws MambuApiException {
 
-		// get just the client info
-		GLAccount glAccount = mambu.getGLAccount(glCode);
+		//get the account balance, with an optional date range
+		GLAccount glAccount;
+		if (duration == null) { 
+			glAccount = mambu.getGLAccount(glCode);
+		} else {
+			glAccount = mambu.getGLAccount(glCode, DateUtils.format(duration.from), DateUtils.format(duration.to));
+		}
+			
 
 		return glAccount.getBalance();
 
@@ -145,11 +162,11 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 	 * Generates the xml for a given connection with the specified inputs
 	 */
 	@Override
-	public String generateXML(RequestSetttings conn, LinkedHashMap<XBRLElement, String> values) {
+	public String generateXML(XBRLGenerationParamaters params) {
 
 		MambuAPIService mambu;
 		try {
-			mambu = createService(conn);
+			mambu = createService(params);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -159,24 +176,18 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 		String generatedXML = "";
 
 		try {
-			XBRLGenerator XBRLGenerator = new XBRLGenerator();
+			XBRLGenerator xBRLGenerator = new XBRLGenerator();
+			xBRLGenerator.addContext(params.durations);
+			xBRLGenerator.addNumberUnit();
+			xBRLGenerator.addCurrencyUnit("KHR");
 
-			// now process the inputs
-			for (Entry<XBRLElement, String> entryValues : values.entrySet()) {
+			// now process the xbrl financial inputs
+			processXBRLFinancials(mambu, xBRLGenerator, params);
+			
+			//and process
+			processXBRLIndicators(mambu,xBRLGenerator);
 
-				//skip empties
-				if (entryValues.getValue() == null || entryValues.getValue().isEmpty()) {
-					continue;
-				}
-				
-				BigDecimal processInputstring = processInputstring(mambu, entryValues.getValue());
-
-				// add to the xml
-				XBRLGenerator.addElement(entryValues.getKey(), processInputstring);
-
-			}
-
-			generatedXML = XBRLGenerator.generate();
+			generatedXML = xBRLGenerator.generate();
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -188,13 +199,74 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 	}
 
 	/**
+	 * Process the XBRL financial elements specified as parameters
+	 * @param mambu
+	 * @param xBRLGenerator
+	 * @param params
+	 */
+	private void processXBRLFinancials(MambuAPIService mambu, XBRLGenerator xBRLGenerator, XBRLGenerationParamaters params) {
+		for (Entry<XBRLElement, String> entryValues : params.values.entrySet()) {
+
+			XBRLElement key = entryValues.getKey();
+			//skip empties
+			if (entryValues.getValue() == null || entryValues.getValue().isEmpty()) {
+				continue;
+			}
+			
+			//process the key based on it's period type
+			switch (key.getPeriod()) {
+			case DURATION:
+				//go through all durations
+				for (Duration durr : params.durations) {
+					
+					BigDecimal processInputstring = processInputString(mambu, entryValues.getValue(), durr);
+
+					// add to the xml
+					xBRLGenerator.addElement(key, processInputstring, durr);
+				}
+
+				break;
+				
+			//for instances processes it for just right now
+			case INSTANT:
+				BigDecimal processInputstring = processInputString(mambu, entryValues.getValue(), null);
+
+				// add to the xml
+				xBRLGenerator.addElement(key, processInputstring);
+				break;
+			
+			}
+			
+
+		}
+	}
+	
+	/**
+	 * Processes the indicators
+	 * 
+	 * @param mambu
+	 * @param xBRLGenerator
+	 * @throws MambuApiException
+	 */
+	private void processXBRLIndicators(MambuAPIService mambu, XBRLGenerator xBRLGenerator) throws MambuApiException {
+
+		// go through the map
+		for (Entry<Indicator, XBRLElement> entries : IndicatorElementMap.getMap().entrySet()) {
+
+			BigDecimal indicatorValue = mambu.getIndicator(entries.getKey());
+
+			xBRLGenerator.addElement(entries.getValue(), indicatorValue);
+		}
+	}
+
+	/**
 	 * Creates the API Service from the request settings
 	 * 
 	 * @param settings
 	 * @return
 	 * @throws MambuApiException
 	 */
-	private MambuAPIService createService(RequestSetttings settings) throws MambuApiException {
+	private MambuAPIService createService(XBRLGenerationParamaters settings) throws MambuApiException {
 		MambuAPIService mambu = MambuAPIFactory.crateService(settings.username, settings.password, settings.domain);
 		mambu.setProtocol("http");
 		return mambu;

@@ -26,8 +26,9 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.mambu.xbrl.client.XBRLProcessService;
 import com.mambu.xbrl.client.XBRLProcessServiceAsync;
+import com.mambu.xbrl.shared.Duration;
 import com.mambu.xbrl.shared.ElementCategory;
-import com.mambu.xbrl.shared.RequestSetttings;
+import com.mambu.xbrl.shared.XBRLGenerationParamaters;
 import com.mambu.xbrl.shared.XBRLElement;
 
 public class XBRLCreatorView extends Composite implements HasRequestSettings {
@@ -79,8 +80,8 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 		
 		//initialize
 		domain.setText("demo.mambuonline.com");
-		username.setText("apied");
-		password.setText("apied");
+		username.setText("api");
+		password.setText("api");
 	}
 	
 	/**
@@ -113,15 +114,23 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 	 * Gets the connection info settings
 	 * @return
 	 */
-	public RequestSetttings getRequestSettings() {
+	public XBRLGenerationParamaters getRequestParams() {
 	
-		RequestSetttings info = new RequestSetttings();
+		XBRLGenerationParamaters info = new XBRLGenerationParamaters();
 		info.domain = domain.getValue();
 		info.username = username.getValue();
 		info.password = password.getValue();
-		info.fromDate = fromDate.getValue();
-		info.toDate = toDate.getValue();
 		
+		//duration
+		Duration duration = new Duration(fromDate.getValue(),toDate.getValue());
+		if (duration.isDefined()) {
+			info.durations.add(duration);
+
+		}
+		
+		//values
+		info.values =  getXBRLValues();		
+
 		return info;
 	}
 	
@@ -142,9 +151,8 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 	void onExecuteButtonClick(ClickEvent event) {
 		
 		//get the values
-		LinkedHashMap<XBRLElement, String> values = getXBRLValues();
-		
-		processService.generateXML(getRequestSettings(), values, new AsyncCallback<String>() {
+		XBRLGenerationParamaters params = getRequestParams();
+		processService.generateXML(params, new AsyncCallback<String>() {
 			
 			@Override
 			public void onSuccess(String result) {
