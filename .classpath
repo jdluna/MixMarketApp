@@ -2,8 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" output="test-classes" path="test"/>
-	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
-	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/Mambu-APIs-Java-0.1-SNAPSHOT-jar-with-dependencies.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/mambu-models-v1.10.jar"/>
@@ -17,5 +15,7 @@
 			<attribute name="optional" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER/GWT (2)"/>
+	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER/App Engine (2)"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
