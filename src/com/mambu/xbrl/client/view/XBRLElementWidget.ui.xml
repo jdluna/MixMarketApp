@@ -8,6 +8,7 @@
 			color: #597565;
 			float: left;
 			margin-right: 10px;
+			font-size: 90%;
 		}
 		
 		.value, .valueComputed , .valueError {
@@ -15,9 +16,9 @@
 			color: #00223f;
 			font-weight: bold;
 			float: left;
-			border: 1px solid #999;
+			border: 1px solid #ccc;
 			margin-right: 10px;
-			font-size: 110%;
+			font-size: 105%;
 		}
 		
 		.value:FOCUS{
@@ -45,6 +46,7 @@
 	</ui:style>
 	<g:HTMLPanel styleName="{style.holder}">
 			<g:Label ui:field="label" styleName="{style.label}"/><br/>
-			<g:TextBox ui:field="value" styleName="{style.value}"/>
+			<g:TextBox ui:field="value" styleName="{style.value}"/> <g:Image ui:field="loadingImage" url="/img/loading4.gif" />	
+			
 	</g:HTMLPanel>
 </ui:UiBinder> 

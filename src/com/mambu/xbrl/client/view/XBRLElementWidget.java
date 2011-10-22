@@ -12,6 +12,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -33,6 +34,9 @@ public class XBRLElementWidget extends Composite {
 
 	@UiField
 	TextBox value;
+	
+	@UiField
+	Image loadingImage;
 
 	interface MyStyle extends CssResource {
 		String valueError();
@@ -70,6 +74,8 @@ public class XBRLElementWidget extends Composite {
 		dialogBox.setAnimationEnabled(true);
 		dialogBox.setWidget(dialogLabel);
 		dialogBox.setAutoHideEnabled(true);
+		
+		loadingImage.setVisible(false);
 	}
 
 	public @UiConstructor
@@ -108,14 +114,20 @@ public class XBRLElementWidget extends Composite {
 		
 		//store the current expression
 		valueExpression = value.getValue();
-
+		
 		if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+			
+			loadingImage.setVisible(true);
+
+			
 			processService.processRequest(requestController.getRequestParams(), element, value.getValue(), new AsyncCallback<String>() {
 
 				@Override
 				public void onSuccess(String result) {
 					value.setStyleName(style.valueComputed());
 					value.setText(result);
+					loadingImage.setVisible(false);
+
 				}
 
 				@Override
@@ -124,6 +136,8 @@ public class XBRLElementWidget extends Composite {
 					value.setStyleName(style.valueError());
 					dialogLabel.setText(caught.toString() + " : " +caught.getMessage());
 					dialogBox.center();
+					loadingImage.setVisible(false);
+
 				}
 			});
 		}

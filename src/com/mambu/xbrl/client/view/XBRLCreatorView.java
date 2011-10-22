@@ -17,6 +17,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.TextArea;
@@ -56,6 +57,9 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 	
 	@UiField
 	Label storedKeyValue, storedKeyError;
+	
+	@UiField
+	Image loadingImage;
 
 	HashMap<ElementCategory, FlowPanel> categoryTabMap = new HashMap<ElementCategory, FlowPanel>();
 	List<XBRLElementWidget> elementWidgets = new ArrayList<XBRLElementWidget>();
@@ -91,6 +95,8 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 		loadDialog.setGlassEnabled(true);
 		loadDialog.show();
 		loadDialog.hide();
+		
+		loadingImage.setVisible(false);
 		
 		outputPanel.setVisible(false);
 		
@@ -180,6 +186,7 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 	void onExecuteButtonClick(ClickEvent event) {
 		
 		//get the values
+		loadingImage.setVisible(true);
 		XBRLGenerationParameters params = getRequestParams();
 		processService.generateXML(params, new AsyncCallback<String>() {
 			
@@ -187,12 +194,15 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 			public void onSuccess(String result) {
 				outputPanel.setVisible(true);
 				XBRLOutput.setText(result);
+				loadingImage.setVisible(false);
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				dialogLabel.setText(caught.getMessage());
-				errorDialogBox.center();				
+				dialogLabel.setText(caught.toString() + " : " + caught.getMessage());
+				errorDialogBox.center();		
+				loadingImage.setVisible(false);
+
 			}
 		});
 	}
