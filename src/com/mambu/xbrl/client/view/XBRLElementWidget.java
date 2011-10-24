@@ -95,7 +95,9 @@ public class XBRLElementWidget extends Composite {
 				nameWithSpaces.append(c);
 			}
 		}
+		
 		this.label.setText(nameWithSpaces.toString());
+		this.value.getElement().setAttribute("title", nameWithSpaces.toString());
 	}
 
 	public XBRLElementWidget(XBRLElement elementName) {

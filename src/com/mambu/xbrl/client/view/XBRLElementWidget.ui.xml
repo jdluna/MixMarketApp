@@ -9,6 +9,8 @@
 			float: left;
 			margin-right: 10px;
 			font-size: 90%;
+			width: 200px;
+			height: 5px;
 		}
 		
 		.value, .valueComputed , .valueError {
@@ -19,6 +21,7 @@
 			border: 1px solid #ccc;
 			margin-right: 10px;
 			font-size: 105%;
+			width: 200px
 		}
 		
 		.value:FOCUS{

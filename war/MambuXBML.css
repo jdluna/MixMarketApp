@@ -55,3 +55,8 @@ body {
     border-bottom: none;
     box-shadow: 1px 5px 7px #8AB131;
 }
+
+.gwt-TabLayoutPanelContent {
+	overflow: auto !important;
+    padding: 6px;	
+}

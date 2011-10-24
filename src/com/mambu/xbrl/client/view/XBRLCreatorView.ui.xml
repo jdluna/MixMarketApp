@@ -116,7 +116,6 @@
 		
 		.tabPanel {
 			overflow: auto;	
-			width: 95%;
 		}
 	</ui:style>
 	<g:HTMLPanel styleName="{style.panel}">
@@ -149,7 +148,7 @@
 
 		<h2>XBRL Mapping</h2>
 
-		<g:TabLayoutPanel barHeight="2" barUnit="EM" height="300px" animationVertical="true" ui:field="tabPanel" addStyleNames="{style.tabPanel}"/>
+		<g:TabLayoutPanel barHeight="2" barUnit="EM" height="350px" animationVertical="true" ui:field="tabPanel" addStyleNames="{style.tabPanel}"/>
 		
 		<g:Button ui:field="executeButton" styleName="{style.executeButton}">Preview XBRL</g:Button>
 		<g:Image ui:field="loadingImage" url="/img/loading4.gif" />	

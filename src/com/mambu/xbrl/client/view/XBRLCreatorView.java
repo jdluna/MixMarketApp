@@ -131,7 +131,7 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 			//create the widget and add it to the panel
 			XBRLElementWidget elementWidget = new XBRLElementWidget(element);
 			if (element.getType() == ElementType.STRING) {
-				elementWidget.value.setWidth("350px");
+				elementWidget.value.setWidth("325px");
 			} else {
 				elementWidget.setRequestController(this);
 			}			

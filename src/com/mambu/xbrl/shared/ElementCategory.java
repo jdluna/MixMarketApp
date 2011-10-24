@@ -11,12 +11,10 @@ public enum ElementCategory {
 	GENERAL("General Info"),
 
 	BALANCE_SHEET("Balance Sheet"),
-
-	CASH("Cash"),
-
-	LOAN_PORTFOLO("Loan Portfolio"),
-
-	INCOME_STATEMENT("Income Statement")
+	
+	INCOME("Incomes"),
+	
+	EXPENSE("Expenses"),
 
 	;
 
