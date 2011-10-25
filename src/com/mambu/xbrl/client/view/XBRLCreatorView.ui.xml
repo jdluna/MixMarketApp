@@ -52,8 +52,9 @@
     		border: 2px solid black;
     		border-top: none;
     		border-bottom: none;
-    		overflow: auto;
-		}
+    		overflow-x: hidden;
+    		overflow-y: auto;
+    	}
 		
 		.executeButton {
 		    clear: both;
@@ -149,12 +150,21 @@
 		<h2>XBRL Mapping</h2>
 
 		<g:TabLayoutPanel barHeight="2" barUnit="EM" height="350px" animationVertical="true" ui:field="tabPanel" addStyleNames="{style.tabPanel}"/>
-		
+	
+	<g:FormPanel ui:field='exportFormPanel' debugId='exportFormPanel'>
+		<g:HTMLPanel>
 		<g:Button ui:field="executeButton" styleName="{style.executeButton}">Preview XBRL</g:Button>
 		<g:Image ui:field="loadingImage" url="/img/loading4.gif" />	
 		<g:Button ui:field="storeButton"  styleName="{style.mappingButton}">Store Mappings</g:Button>
 		<g:Button ui:field="loadButton"  styleName="{style.mappingButton}">Load Mappings</g:Button>
+		<g:Button ui:field="resetButton"  styleName="{style.mappingButton}">Reset Mappings</g:Button>
 
+			<!-- field names and values are provided dynamically -->
+			<g:Hidden ui:field='xmlContents' debugId='excelFile' />
+			<g:Button ui:field='exportButton' debugId='exportButton' styleName="{style.executeButton}" >Download</g:Button>
+		</g:HTMLPanel>
+	</g:FormPanel>
+	
 		<g:HTMLPanel ui:field="outputPanel">
 			<h2>XBRL Output</h2>	
 		

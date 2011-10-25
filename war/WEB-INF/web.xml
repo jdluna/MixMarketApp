@@ -16,6 +16,16 @@
     <url-pattern>/mambuxbrl/greet</url-pattern>
   </servlet-mapping>
   
+  <servlet>
+    <servlet-name>xmldownload</servlet-name>
+    <servlet-class>com.mambu.xbrl.server.DownloadXMLServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>xmldownload</servlet-name>
+    <url-pattern>/mambuxbrl/xmldownload</url-pattern>
+  </servlet-mapping>
+  
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>MambuXBML.html</welcome-file>

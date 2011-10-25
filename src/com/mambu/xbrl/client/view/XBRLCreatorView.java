@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.FormElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
@@ -16,7 +17,9 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
@@ -44,7 +47,7 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 	@UiField HTMLPanel outputPanel;
 	
 	@UiField 
-	Button executeButton, storeButton, loadButton, retrieveButton;
+	Button executeButton, storeButton, loadButton, retrieveButton, resetButton, exportButton;
 
 	@UiField
 	TextBox domain, username, password, getXBRLMappingKey;
@@ -60,6 +63,12 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 	
 	@UiField
 	Image loadingImage;
+	
+	@UiField
+	FormPanel exportFormPanel;
+	
+	@UiField
+	Hidden xmlContents;
 
 	HashMap<ElementCategory, FlowPanel> categoryTabMap = new HashMap<ElementCategory, FlowPanel>();
 	List<XBRLElementWidget> elementWidgets = new ArrayList<XBRLElementWidget>();
@@ -112,6 +121,15 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 		domain.setText("demo.mambuonline.com");
 		username.setText("api");
 		password.setText("api");
+		
+		//setup the form
+		FormElement.as(exportFormPanel.getElement()).setAcceptCharset("UTF-8");
+		exportFormPanel.setAction("/mambuxbrl/xmldownload");
+		exportFormPanel.setEncoding(FormPanel.ENCODING_URLENCODED);
+		exportFormPanel.setMethod(FormPanel.METHOD_POST);
+		xmlContents.setName("xml");
+		
+		exportButton.setVisible(false);
 	}
 	
 	/**
@@ -195,6 +213,7 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 				outputPanel.setVisible(true);
 				XBRLOutput.setText(result);
 				loadingImage.setVisible(false);
+				exportButton.setVisible(true);
 			}
 			
 			@Override
@@ -202,6 +221,8 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 				dialogLabel.setText(caught.toString() + " : " + caught.getMessage());
 				errorDialogBox.center();		
 				loadingImage.setVisible(false);
+				exportButton.setVisible(false);
+
 
 			}
 		});
@@ -223,6 +244,22 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 		
 		
 		
+	}
+	
+	/**
+	 * When clicking on the export button the filename and HTML table in the form is updated.
+	 * 
+	 * @param e
+	 */
+	@UiHandler("exportButton")
+	void exportButtonClicked(ClickEvent e) {
+
+		// update values
+		xmlContents.setValue(XBRLOutput.getText());
+
+		// submit form
+		exportFormPanel.submit();
+
 	}
 
 	/**
@@ -250,6 +287,16 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 	void onLoadButton(ClickEvent e) {
 		getXBRLMappingKey.setText("");
 		loadDialog.center();
+		
+	}
+	
+	@UiHandler("resetButton")
+	void resetButton(ClickEvent e) {
+		//reset paramaters
+		parameters = new XBRLGenerationParameters();
+		populateResults();
+		exportButton.setVisible(false);
+		outputPanel.setVisible(false);
 		
 	}
 	
@@ -291,6 +338,9 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 			XBRLElement element = widget.element;
 			if (values.containsKey(element)) {
 				widget.value.setText(values.get(element));
+			} else {
+				widget.value.setText("");
+
 			}
 			
 		}		
