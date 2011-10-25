@@ -43,7 +43,7 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 	private static XBRLCreatorViewUiBinder uiBinder = GWT.create(XBRLCreatorViewUiBinder.class);
 	
 	@UiField TabLayoutPanel tabPanel;
-	@UiField TextArea XBRLOutput;
+	@UiField TextArea xBRLOutput;
 	@UiField HTMLPanel outputPanel;
 	
 	@UiField 
@@ -84,6 +84,8 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 	public XBRLCreatorView() {
 		initWidget(uiBinder.createAndBindUi(this));
 		
+		xBRLOutput.getElement().setAttribute("wrap", "off");
+		
 		storedKeyError.setVisible(false);
 		
 		//create the dialog box
@@ -118,10 +120,10 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 		populateElements();
 		
 		//initialize
-		domain.setText("demo.mambuonline.com");
-		username.setText("api");
-		password.setText("api");
-		
+//		domain.setText("demo.mambuonline.com");
+//		username.setText("api");
+//		password.setText("api");
+//		
 		//setup the form
 		FormElement.as(exportFormPanel.getElement()).setAcceptCharset("UTF-8");
 		exportFormPanel.setAction("/mambuxbrl/xmldownload");
@@ -211,7 +213,7 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 			@Override
 			public void onSuccess(String result) {
 				outputPanel.setVisible(true);
-				XBRLOutput.setText(result);
+				xBRLOutput.setText(result);
 				loadingImage.setVisible(false);
 				exportButton.setVisible(true);
 			}
@@ -255,7 +257,7 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 	void exportButtonClicked(ClickEvent e) {
 
 		// update values
-		xmlContents.setValue(XBRLOutput.getText());
+		xmlContents.setValue(xBRLOutput.getText());
 
 		// submit form
 		exportFormPanel.submit();

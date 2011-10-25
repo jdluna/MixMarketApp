@@ -75,7 +75,7 @@
 			border: 1px dotted #CCCCCC;
 		    color: #333333;
 		    font-family: monospace;
-		    font-size: 80%;
+		    font-size: 90%;
 		    padding: 4px;
 			
 		}
@@ -168,7 +168,7 @@
 		<g:HTMLPanel ui:field="outputPanel">
 			<h2>XBRL Output</h2>	
 		
-			<g:TextArea ui:field="XBRLOutput" width="100%" height="200px" styleName="{style.xbmloutput}"/>
+			<g:TextArea ui:field="xBRLOutput" width="100%" height="400px" styleName="{style.xbmloutput}"/>
 		</g:HTMLPanel>
 		
 		<h1/>

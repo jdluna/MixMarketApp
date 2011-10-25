@@ -10,7 +10,8 @@
 			margin-right: 10px;
 			font-size: 90%;
 			width: 200px;
-			height: 5px;
+			height: 14px;
+			overflow: hidden;
 		}
 		
 		.value, .valueComputed , .valueError {
