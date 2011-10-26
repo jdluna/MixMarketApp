@@ -33,6 +33,46 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 	private final static ScriptEngine SCRIPT_ENGINE = new ScriptEngineManager().getEngineByName("JavaScript");
 
 	/**
+	 * Generates the xml for a given connection with the specified inputs
+	 */
+	@Override
+	public String generateXML(XBRLGenerationParameters params) {
+
+		MambuAPIService mambu;
+		try {
+			mambu = createService(params);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new IllegalArgumentException(e.getMessage());
+		}
+
+		String generatedXML = "";
+
+		try {
+			XBRLGenerator xBRLGenerator = new XBRLGenerator();
+			xBRLGenerator.addContext(params.durations);
+			xBRLGenerator.addNumberUnit();
+			xBRLGenerator.addCurrencyUnit(mambu.getCurrency().getCode());
+
+			// now process the xbrl financial inputs
+			processXBRLFinancials(mambu, xBRLGenerator, params);
+			
+			//and process
+			processXBRLIndicators(mambu,xBRLGenerator);
+
+			generatedXML = xBRLGenerator.generate();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new IllegalArgumentException(e.getMessage());
+
+		}
+
+		return generatedXML;
+	}
+	
+	/**
 	 * Processses a single xbrml request
 	 */
 	
@@ -159,45 +199,7 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 		return originalString.replaceAll("\\{" + glCode + "\\}", result.toString());
 	}
 
-	/**
-	 * Generates the xml for a given connection with the specified inputs
-	 */
-	@Override
-	public String generateXML(XBRLGenerationParameters params) {
 
-		MambuAPIService mambu;
-		try {
-			mambu = createService(params);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new IllegalArgumentException(e.getMessage());
-		}
-
-		String generatedXML = "";
-
-		try {
-			XBRLGenerator xBRLGenerator = new XBRLGenerator();
-			xBRLGenerator.addContext(params.durations);
-			xBRLGenerator.addNumberUnit();
-			xBRLGenerator.addCurrencyUnit("KHR");
-
-			// now process the xbrl financial inputs
-			processXBRLFinancials(mambu, xBRLGenerator, params);
-			
-			//and process
-			processXBRLIndicators(mambu,xBRLGenerator);
-
-			generatedXML = xBRLGenerator.generate();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new IllegalArgumentException(e.getMessage());
-
-		}
-
-		return generatedXML;
-	}
 
 	/**
 	 * Process the XBRL financial elements specified as parameters

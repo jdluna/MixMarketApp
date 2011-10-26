@@ -123,7 +123,7 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 //		domain.setText("demo.mambuonline.com");
 //		username.setText("api");
 //		password.setText("api");
-//		
+		
 		//setup the form
 		FormElement.as(exportFormPanel.getElement()).setAcceptCharset("UTF-8");
 		exportFormPanel.setAction("/mambuxbrl/xmldownload");
