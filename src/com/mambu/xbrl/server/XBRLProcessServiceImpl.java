@@ -3,6 +3,7 @@ package com.mambu.xbrl.server;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,6 +12,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.mambu.accounting.shared.model.GLAccount;
 import com.mambu.apisdk.MambuAPIFactory;
 import com.mambu.apisdk.MambuAPIService;
@@ -20,9 +22,8 @@ import com.mambu.xbrl.client.XBRLProcessService;
 import com.mambu.xbrl.shared.Duration;
 import com.mambu.xbrl.shared.IndicatorElementMap;
 import com.mambu.xbrl.shared.PeriodType;
-import com.mambu.xbrl.shared.XBRLGenerationParameters;
 import com.mambu.xbrl.shared.XBRLElement;
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.mambu.xbrl.shared.XBRLGenerationParameters;
 
 /**
  * The server side implementation of the RPC service.
@@ -30,7 +31,9 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 @SuppressWarnings("serial")
 public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRLProcessService {
 
-	private final static ScriptEngine SCRIPT_ENGINE = new ScriptEngineManager().getEngineByName("JavaScript");
+    private static final Logger log = Logger.getLogger(XBRLProcessServiceImpl.class.getName());
+
+	private static final ScriptEngine SCRIPT_ENGINE = new ScriptEngineManager().getEngineByName("JavaScript");
 
 	/**
 	 * Generates the xml for a given connection with the specified inputs
@@ -115,7 +118,7 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 			try {
 				accountBalance = getAccountBalance(mambu, glCode, duration);
 			} catch (MambuApiException e) {
-				System.out.println(e.getErrorMessage());
+				log.severe(e.getErrorMessage());
 				throw new IllegalArgumentException(e.getErrorMessage());
 			}
 
@@ -125,10 +128,12 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 		}
 
 		// evaluate the expression
-		Double eval = 0d;
+		Float eval = 0f;
 		try {
-			eval = (Double) SCRIPT_ENGINE.eval(oriString);
+			Number value = (Number)SCRIPT_ENGINE.eval(oriString);
+			eval = value.floatValue();
 		} catch (ScriptException e) {
+			e.printStackTrace();
 			throw new IllegalArgumentException(e.getMessage());
 		}
 

@@ -10,6 +10,8 @@
 			<attribute name="javadoc_location" value="http://www.xom.nu/apidocs/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/bsf-all-3.0-beta3.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/js.jar"/>
 	<classpathentry kind="src" path=".apt_generated">
 		<attributes>
 			<attribute name="optional" value="true"/>
