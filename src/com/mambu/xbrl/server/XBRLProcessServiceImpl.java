@@ -54,6 +54,7 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 
 		try {
 			XBRLGenerator xBRLGenerator = new XBRLGenerator();
+			xBRLGenerator.addLink();
 			xBRLGenerator.addContext(params.durations);
 			xBRLGenerator.addNumberUnit();
 			xBRLGenerator.addCurrencyUnit(mambu.getCurrency().getCode());

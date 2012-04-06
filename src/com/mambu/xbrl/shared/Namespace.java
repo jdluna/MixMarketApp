@@ -16,7 +16,11 @@ public enum Namespace {
 
 	XBRLDI("xbrldi", "http://xbrl.org/2006/xbrldi"),
 
-	XBRLI("xbrli", "http://www.xbrl.org/2003/instance");
+	XBRLI("xbrli", "http://www.xbrl.org/2003/instance"),
+	
+	LINK("link", "http://www.xbrl.org/2003/linkbase"),
+	
+	DCALL("dc-all", "http://www.themix.org/int/fr/ifrs/basi/2010-08-31/dc-all");
 
 	private String prefix;
 	private String url;

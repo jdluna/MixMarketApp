@@ -29,6 +29,9 @@ public class XBRLGenerator {
 	
 	private String currencyUnit;
 	private String numericUnit = "Number";
+	
+	// ID of the organization
+	private static String IDENTIFIER = "0000000";
 
 	private Document doc;
 	private Element root;
@@ -159,13 +162,13 @@ public class XBRLGenerator {
 	 */
 	public void addCurrencyUnit(String currencyCode) {
 		currencyUnit = currencyCode;
-		Element currencyUnitEleemnt = new Element("unit");
-		currencyUnitEleemnt.addAttribute(new Attribute("id", currencyUnit));
+		Element currencyUnitElement = new Element("unit");
+		currencyUnitElement.addAttribute(new Attribute("id", currencyUnit));
 		Element measure = new Element("measure");
 		measure.appendChild(Namespace.ISO4217.getPrefix() + ":" + currencyCode);
-		currencyUnitEleemnt.appendChild(measure);
+		currencyUnitElement.appendChild(measure);
 
-		root.appendChild(currencyUnitEleemnt);
+		root.appendChild(currencyUnitElement);
 
 	}
 
@@ -188,6 +191,17 @@ public class XBRLGenerator {
 		return root;
 
 	}
+	
+
+	/**
+	 * Adds the link
+	 */
+	public void addLink() {
+
+		Element schemaRef = new Element("schemaRef");
+		schemaRef.addNamespaceDeclaration("link", "http://www.themix.org/sites/default/files/Taxonomy2010/dct/dc-all_2010-08-31.xsd");
+		root.appendChild(schemaRef);
+	}
 
 	/**
 	 * Adds the context to the document
@@ -206,6 +220,7 @@ public class XBRLGenerator {
 
 		Element identifier = new Element("identifier");
 		identifier.addAttribute(new Attribute("scheme", "http://www.themix.org"));
+		identifier.appendChild(IDENTIFIER);
 		entity.appendChild(identifier);
 
 		Element period = new Element("period");
@@ -232,6 +247,7 @@ public class XBRLGenerator {
 
 			Element identifier2 = new Element("identifier");
 			identifier2.addAttribute(new Attribute("scheme", "http://www.themix.org"));
+			identifier2.appendChild(IDENTIFIER);
 			entity2.appendChild(identifier2);
 
 			//add the period
@@ -260,5 +276,6 @@ public class XBRLGenerator {
 		int index = string.indexOf(".");
 		return index < 0 ? 0 : string.length() - index - 1;
 	}
+
 
 }
