@@ -24,7 +24,6 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.TextArea;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.DateBox;
 import com.mambu.xbrl.client.XBRLProcessService;
@@ -33,13 +32,12 @@ import com.mambu.xbrl.shared.Duration;
 import com.mambu.xbrl.shared.ElementCategory;
 import com.mambu.xbrl.shared.ElementType;
 import com.mambu.xbrl.shared.XBRLElement;
-import com.mambu.xbrl.shared.XBRLGenerationParameters;
+import com.mambu.xbrl.shared.TenantSettings;
 
-public class XBRLCreatorView extends Composite implements HasRequestSettings {
+public class XBRLCreatorView extends Composite {
 
 	private final XBRLProcessServiceAsync processService = GWT.create(XBRLProcessService.class);
 
-	
 	private static XBRLCreatorViewUiBinder uiBinder = GWT.create(XBRLCreatorViewUiBinder.class);
 	
 	@UiField TabLayoutPanel tabPanel;
@@ -47,19 +45,13 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 	@UiField HTMLPanel outputPanel;
 	
 	@UiField 
-	Button executeButton, storeButton, loadButton, retrieveButton, resetButton, exportButton;
+	Button executeButton, storeButton, resetButton, exportButton;
 
-	@UiField
-	TextBox domain, username, password, getXBRLMappingKey;
-	
 	@UiField
 	DateBox fromDate, toDate;
 	
 	@UiField
-	DialogBox storedDialog, loadDialog;
-	
-	@UiField
-	Label storedKeyValue, storedKeyError;
+	DialogBox storedDialog;
 	
 	@UiField
 	Image loadingImage;
@@ -76,7 +68,7 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 	final DialogBox errorDialogBox = new DialogBox();
 	Label dialogLabel = new Label();
 
-	XBRLGenerationParameters parameters = new XBRLGenerationParameters();
+	TenantSettings parameters = new TenantSettings();
 
 	interface XBRLCreatorViewUiBinder extends UiBinder<Widget, XBRLCreatorView> {
 	}
@@ -85,9 +77,7 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 		initWidget(uiBinder.createAndBindUi(this));
 		
 		xBRLOutput.getElement().setAttribute("wrap", "off");
-		
-		storedKeyError.setVisible(false);
-		
+				
 		//create the dialog box
 		errorDialogBox.setText("Remote Procedure Call");
 		errorDialogBox.setAnimationEnabled(true);
@@ -101,12 +91,6 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 		storedDialog.show();
 		storedDialog.hide();
 		
-		loadDialog.setAnimationEnabled(true);
-		loadDialog.setAutoHideEnabled(true);
-		loadDialog.setGlassEnabled(true);
-		loadDialog.show();
-		loadDialog.hide();
-		
 		loadingImage.setVisible(false);
 		
 		outputPanel.setVisible(false);
@@ -118,12 +102,7 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 
 		createTabs();
 		populateElements();
-		
-		//initialize
-//		domain.setText("demo.mambuonline.com");
-//		username.setText("api");
-//		password.setText("api");
-		
+
 		//setup the form
 		FormElement.as(exportFormPanel.getElement()).setAcceptCharset("UTF-8");
 		exportFormPanel.setAction("/mambuxbrl/xmldownload");
@@ -132,6 +111,9 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 		xmlContents.setName("xml");
 		
 		exportButton.setVisible(false);
+		
+		//try loading the settings
+		loadParams();
 	}
 	
 	/**
@@ -152,10 +134,8 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 			XBRLElementWidget elementWidget = new XBRLElementWidget(element);
 			if (element.getType() == ElementType.STRING) {
 				elementWidget.value.setWidth("325px");
-			} else {
-				elementWidget.setRequestController(this);
-			}			
-
+			} 
+			
 			flowPanel.add(elementWidget);
 			
 			//add the widget
@@ -165,29 +145,6 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 
 	}
 
-	/**
-	 * Gets the connection info settings
-	 * @return
-	 */
-	public XBRLGenerationParameters getRequestParams() {
-	
-		XBRLGenerationParameters info = new XBRLGenerationParameters();
-		info.domain = domain.getValue();
-		info.username = username.getValue();
-		info.password = password.getValue();
-		
-		//duration
-		Duration duration = new Duration(fromDate.getValue(),toDate.getValue());
-		if (duration.isDefined()) {
-			info.durations.add(duration);
-
-		}
-		
-		//values
-		info.values =  getXBRLValues();		
-
-		return info;
-	}
 	
 	/**
 	 * Creates the tabs and keeps track of them in the hashmap
@@ -207,8 +164,7 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 		
 		//get the values
 		loadingImage.setVisible(true);
-		XBRLGenerationParameters params = getRequestParams();
-		processService.generateXML(params, new AsyncCallback<String>() {
+		processService.generateXML(new AsyncCallback<String>() {
 			
 			@Override
 			public void onSuccess(String result) {
@@ -233,17 +189,7 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 	@UiHandler("storeButton")
 	void onStoreButton(ClickEvent e) {
 		
-		//if first save, then just store
-		if (parameters.getEncodedKey() == null) {
-			storeParams(getRequestParams());
-
-		// update existing params
-		} else {
-			
-			parameters.setValues(getXBRLValues());
-			storeParams(parameters);
-		}
-		
+		storeParams();
 		
 		
 	}
@@ -267,9 +213,23 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 	/**
 	 * Stores the specifed params on the servers
 	 */
-	private void storeParams(XBRLGenerationParameters params) {
+	private void storeParams() {
 
-		processService.storeParams(params, new AsyncCallback<String>() {
+		if (parameters == null) {
+			parameters = new TenantSettings();
+		}
+		
+		//duration
+		Duration duration = new Duration(fromDate.getValue(),toDate.getValue());
+		if (duration.isDefined()) {
+			parameters.getDurations().add(duration);
+
+		}
+		
+		//values
+		parameters.setValues(getXBRLValues());	
+		
+		processService.storeParams(parameters, new AsyncCallback<TenantSettings>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -278,55 +238,39 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 			}
 
 			@Override
-			public void onSuccess(String result) {
-				storedKeyValue.setText(result);
+			public void onSuccess(TenantSettings result) {
+				parameters = result;
 				storedDialog.center();				
 			}
 		});
 	}
 
-	@UiHandler("loadButton")
-	void onLoadButton(ClickEvent e) {
-		getXBRLMappingKey.setText("");
-		loadDialog.center();
-		
-	}
 	
 	@UiHandler("resetButton")
 	void resetButton(ClickEvent e) {
 		//reset paramaters
-		parameters = new XBRLGenerationParameters();
+		parameters = new TenantSettings();
 		populateResults();
 		exportButton.setVisible(false);
 		outputPanel.setVisible(false);
 		
 	}
 	
-	@UiHandler("retrieveButton")
-	void onRetrieveButtonClicked(ClickEvent e) {
+	private void loadParams() {
 		
-		String key = getXBRLMappingKey.getText();
-		
-		processService.getParams(key, new AsyncCallback<XBRLGenerationParameters>() {
+		processService.getParams(new AsyncCallback<TenantSettings>() {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				storedKeyError.setVisible(true);				
 			}
 
 			@Override
-			public void onSuccess(XBRLGenerationParameters result) {
-				storedKeyError.setVisible(false);				
-
+			public void onSuccess(TenantSettings result) {
 				parameters = result;
 				populateResults();
-
-				loadDialog.hide();
-				
 								
 			}
 		});
-		
 	}
 	
 	/**
@@ -363,4 +307,6 @@ public class XBRLCreatorView extends Composite implements HasRequestSettings {
 		
 		return values;
 	}
+
+
 }

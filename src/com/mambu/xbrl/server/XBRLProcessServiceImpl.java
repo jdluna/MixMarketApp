@@ -8,9 +8,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import javax.servlet.http.HttpServletRequest;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.mambu.accounting.shared.model.GLAccount;
@@ -23,7 +25,7 @@ import com.mambu.xbrl.shared.Duration;
 import com.mambu.xbrl.shared.IndicatorElementMap;
 import com.mambu.xbrl.shared.PeriodType;
 import com.mambu.xbrl.shared.XBRLElement;
-import com.mambu.xbrl.shared.XBRLGenerationParameters;
+import com.mambu.xbrl.shared.TenantSettings;
 
 /**
  * The server side implementation of the RPC service.
@@ -36,11 +38,23 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 	private static final ScriptEngine SCRIPT_ENGINE = new ScriptEngineManager().getEngineByName("JavaScript");
 
 	/**
+	 * Returns the tenant ID for this session
+	 * @return
+	 */
+	public String getTenantID() {
+		HttpServletRequest request = this.getThreadLocalRequest();
+		String tenantID = (String) request.getSession().getAttribute("TENANT_ID");
+		return tenantID;
+	}
+	/**
 	 * Generates the xml for a given connection with the specified inputs
 	 */
 	@Override
-	public String generateXML(XBRLGenerationParameters params) {
+	public String generateXML() {
 
+		//get the params
+		TenantSettings params = getParams();
+		
 		MambuAPIService mambu;
 		try {
 			mambu = createService(params);
@@ -55,7 +69,7 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 		try {
 			XBRLGenerator xBRLGenerator = new XBRLGenerator();
 			xBRLGenerator.addLink();
-			xBRLGenerator.addContext(params.durations);
+			xBRLGenerator.addContext(params.getDurations());
 			xBRLGenerator.addNumberUnit();
 			xBRLGenerator.addCurrencyUnit(mambu.getCurrency().getCode());
 
@@ -72,17 +86,20 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 			throw new IllegalArgumentException(e.getMessage());
 
 		}
-
+		
 		return generatedXML;
 	}
 	
+
 	/**
 	 * Processses a single xbrml request
 	 */
 	
 	@Override
-	public String processRequest(XBRLGenerationParameters params, XBRLElement element, String input) throws IllegalArgumentException {
+	public String processRequest(XBRLElement element, String input) throws IllegalArgumentException {
 
+		TenantSettings params = getParams();
+		
 		MambuAPIService mambu = null;
 		try {
 			mambu = createService(params);
@@ -92,8 +109,8 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 		}
 
 		Duration duration = null;
-		if (element.getPeriod() ==  PeriodType.DURATION && params.durations.size() > 0) {
-			duration = params.durations.get(0);
+		if (element.getPeriod() ==  PeriodType.DURATION && params.getDurations().size() > 0) {
+			duration = params.getDurations().get(0);
 		}
 		
 		BigDecimal processInputstring = processInputString(mambu, input, duration);
@@ -213,8 +230,8 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 	 * @param xBRLGenerator
 	 * @param params
 	 */
-	private void processXBRLFinancials(MambuAPIService mambu, XBRLGenerator xBRLGenerator, XBRLGenerationParameters params) {
-		for (Entry<XBRLElement, String> entryValues : params.values.entrySet()) {
+	private void processXBRLFinancials(MambuAPIService mambu, XBRLGenerator xBRLGenerator, TenantSettings params) {
+		for (Entry<XBRLElement, String> entryValues : params.getValues().entrySet()) {
 
 			XBRLElement key = entryValues.getKey();
 			//skip empties
@@ -233,7 +250,7 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 			switch (key.getPeriod()) {
 			case DURATION:
 				//go through all durations
-				for (Duration durr : params.durations) {
+				for (Duration durr : params.getDurations()) {
 					
 					BigDecimal processInputstring = processInputString(mambu, entryValues.getValue(), durr);
 
@@ -282,8 +299,8 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 	 * @return
 	 * @throws MambuApiException
 	 */
-	private MambuAPIService createService(XBRLGenerationParameters settings) throws MambuApiException {
-		MambuAPIService mambu = MambuAPIFactory.crateService(settings.username, settings.password, settings.domain);
+	private MambuAPIService createService(TenantSettings settings) throws MambuApiException {
+		MambuAPIService mambu = MambuAPIFactory.crateService(settings.getUsername(), settings.getPassword(), settings.getDomain());
 		mambu.setProtocol("http");
 		return mambu;
 	}
@@ -292,12 +309,19 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 	 * Stores parameters
 	 */
 	@Override
-	public String storeParams(XBRLGenerationParameters params) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		params = pm.makePersistent(params);
-		pm.close();
+	public TenantSettings storeParams(TenantSettings params) {
 		
-		return params.getEncodedKey();
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		
+		try {
+			params = pm.makePersistent(params);
+			params = pm.detachCopy(params);
+			
+		} finally {
+			pm.close();
+		}
+		
+		return params;
 		
 	}
 
@@ -305,16 +329,25 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 	 * Retreives parameters
 	 */
 	@Override
-	public XBRLGenerationParameters getParams(String key) throws IllegalArgumentException {
+	public TenantSettings getParams() {
+		
+		String tenantID = getTenantID();
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		
 		try{
-			XBRLGenerationParameters paramaters = pm.getObjectById(XBRLGenerationParameters.class,key);
-			paramaters = pm.detachCopy(paramaters);
-			return paramaters;
 			
-		} catch (Exception e) {
-			throw new IllegalArgumentException(e);
+			Query query = pm.newQuery(TenantSettings.class,"tenantID == tenantIDParam");
+			query.declareParameters("String tenantIDParam");
+			query.setUnique(true);
+			TenantSettings settings = (TenantSettings) query.execute(tenantID);
+			if (settings != null) {
+				settings = pm.detachCopy(settings);
+			}
+
+			log.info("Retreived params for " + tenantID);
+
+			return settings;	
+				
 		} finally {
 			pm.close();
 

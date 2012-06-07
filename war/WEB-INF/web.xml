@@ -26,9 +26,29 @@
     <url-pattern>/mambuxbrl/xmldownload</url-pattern>
   </servlet-mapping>
   
+  <servlet>
+    <servlet-name>install</servlet-name>
+    <servlet-class>com.mambu.xbrl.server.InstallServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>install</servlet-name>
+    <url-pattern>/mambuxbrl/install</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>uninstall</servlet-name>
+    <servlet-class>com.mambu.xbrl.server.UninstallServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>uninstall</servlet-name>
+    <url-pattern>/mambuxbrl/uninstall</url-pattern>
+  </servlet-mapping>
+  
   <!-- Default page to serve -->
   <welcome-file-list>
-    <welcome-file>MambuXBML.html</welcome-file>
+    <welcome-file>MambuXBML.jsp</welcome-file>
   </welcome-file-list>
 
 </web-app>

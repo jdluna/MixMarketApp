@@ -41,10 +41,6 @@ h2 {
   margin: 15px 6px 6px;
 }
 
-body {
-	background-image: url(img/pattern-1-blue.jpg) !important;
-	background-repeat: repeat-x;
-}
 
 .gwt-TabLayoutPanel .gwt-TabLayoutPanelTabs {
 	background:  none !important;

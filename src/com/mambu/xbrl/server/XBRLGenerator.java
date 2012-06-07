@@ -206,7 +206,7 @@ public class XBRLGenerator {
 	/**
 	 * Adds the context to the document
 	 */
-	void addContext(List<Duration> durations) {
+	public void addContext(List<Duration> durations) {
 		// create the context ID
 
 		String contextIdDate = DateUtils.format(new Date());

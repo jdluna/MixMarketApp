@@ -42,14 +42,11 @@
 		}
 		
 		.panel {
-			box-shadow: 0 4px 18px black;
     		font-family: helvetica,"Lucida Grande",tahoma,verdana,arial,sans-serif;
     		margin-left: auto;
     		margin-right: auto;
     		padding: 30px;
-    		width: 800px;
     		background: white;
-    		border: 2px solid black;
     		border-top: none;
     		border-bottom: none;
     		overflow-x: hidden;
@@ -120,21 +117,7 @@
 		}
 	</ui:style>
 	<g:HTMLPanel styleName="{style.panel}">
-		<h1><g:Image url="http://www.blog.jbi.in/wp-content/uploads/2008/11/xml-icon.gif" height="55px" styleName="{style.logo}"/>Mambu XBRL Export Tool</h1>
-
-		<h2>Mambu Connection</h2>
-
-		<g:FlowPanel styleName="{style.connectionPanel}" width="100%">
-			<g:Label text="Mambu Domain" styleName="{style.label}"/>
-			<g:TextBox ui:field="domain" styleName="{style.textInput}" width="200px"/>
-			
-			<g:Label text="Username" styleName="{style.label}"/>
-			<g:TextBox ui:field="username" styleName="{style.textInput}"/>
-			
-			<g:Label text="Password" styleName="{style.label}"/>
-			<g:PasswordTextBox ui:field="password" styleName="{style.textInput}"/>
-
-		</g:FlowPanel>
+		<h1><g:Image url="http://www.mixmarket.org/sites/all/themes/mixm/logo.png" height="20px" styleName="{style.logo}"/> XBRL Export Tool</h1>
 		
 		<h2>Date Range</h2>
 		
@@ -149,15 +132,14 @@
 
 		<h2>XBRL Mapping</h2>
 
-		<g:TabLayoutPanel barHeight="2" barUnit="EM" height="350px" animationVertical="true" ui:field="tabPanel" addStyleNames="{style.tabPanel}"/>
+		<g:TabLayoutPanel barHeight="2" barUnit="EM" height="400px" animationVertical="true" ui:field="tabPanel" addStyleNames="{style.tabPanel}"/>
 	
 	<g:FormPanel ui:field='exportFormPanel' debugId='exportFormPanel'>
 		<g:HTMLPanel>
 		<g:Button ui:field="executeButton" styleName="{style.executeButton}">Preview XBRL</g:Button>
 		<g:Image ui:field="loadingImage" url="/img/loading4.gif" />	
-		<g:Button ui:field="storeButton"  styleName="{style.mappingButton}">Store Mappings</g:Button>
-		<g:Button ui:field="loadButton"  styleName="{style.mappingButton}">Load Mappings</g:Button>
-		<g:Button ui:field="resetButton"  styleName="{style.mappingButton}">Reset Mappings</g:Button>
+		<g:Button ui:field="storeButton"  styleName="{style.mappingButton}">Save</g:Button>
+		<g:Button ui:field="resetButton"  styleName="{style.mappingButton}">Clear</g:Button>
 
 			<!-- field names and values are provided dynamically -->
 			<g:Hidden ui:field='xmlContents' debugId='excelFile' />
@@ -172,27 +154,10 @@
 		</g:HTMLPanel>
 		
 		<h1/>
-		<g:HTMLPanel>
-			<g:Image url="http://help.mambu.com/templates/mambu2010/images/logo.png" height="20px" styleName="{style.logo}"/>
-			<g:Image url="http://www.mixmarket.org/sites/all/themes/mixm/logo.png" height="20px" styleName="{style.logo}"/>
-		
-		</g:HTMLPanel>
 		
 		<g:DialogBox ui:field="storedDialog" addStyleNames="{style.dialogPanel}">
 			<g:HTMLPanel styleName="{style.dialogPanel}">
-				Your XBRL settings have been stored.<br/> The following is your unique key to retrieve them.
-				<g:Label ui:field="storedKeyValue" styleName="{style.key}"/>
-			</g:HTMLPanel>
-		</g:DialogBox>
-			
-		<g:DialogBox ui:field="loadDialog" addStyleNames="{style.dialogPanel}">
-			<g:HTMLPanel>
-				 Please enter your xbrl mapping key<br/>
-				 <g:TextBox ui:field="getXBRLMappingKey" styleName="{style.getKey}"/> <p/>
-				 <g:Label ui:field="storedKeyError" styleName="{style.error}">Unable to find any stored params with this key</g:Label>
-				 
-				 <g:Button ui:field="retrieveButton"  styleName="{style.mappingButton}">Load</g:Button>
-				 
+				Your XBRL settings have been stored.<br/>
 			</g:HTMLPanel>
 		</g:DialogBox>
 					

@@ -12,13 +12,14 @@
 	<classpathentry kind="lib" path="war/WEB-INF/lib/bsf-all-3.0-beta3.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/js.jar"/>
 	<classpathentry kind="lib" path="war/WEB-INF/lib/mambu-models-v1.10.jar"/>
+	<classpathentry kind="lib" path="war/WEB-INF/lib/lovely.gwt.jsonrpc-0.7.jar"/>
 	<classpathentry kind="src" path=".apt_generated">
 		<attributes>
 			<attribute name="optional" value="true"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="com.google.gwt.eclipse.core.GWT_CONTAINER/GWT (4)"/>
-	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER/App Engine (4)"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>

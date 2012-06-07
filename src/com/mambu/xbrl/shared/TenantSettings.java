@@ -10,9 +10,10 @@ import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
+import javax.jdo.annotations.Unique;
 
 @PersistenceCapable(detachable = "true")
-public class XBRLGenerationParameters implements Serializable {
+public class TenantSettings implements Serializable {
 
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
@@ -20,39 +21,39 @@ public class XBRLGenerationParameters implements Serializable {
 	private String encodedKey;
 
 	private static final long serialVersionUID = 1L;
+		
+	@Persistent
+	@Unique
+	private String tenantID;
+	
+	@Persistent
+	private String domain;
+	
+	@Persistent
+	private String appKey;
 
-	@NotPersistent
-	public String domain;
+	@Persistent
+	private String username;
 
-	@NotPersistent
-	public String username;
-
-	@NotPersistent
-	public String password;
+	@Persistent
+	private String password;
 
 	/**
 	 * @gwt.typeArgs <com.mambu.xbrl.shared.Duration>
 	 */
 	@NotPersistent
-	public ArrayList<Duration> durations = new ArrayList<Duration>();
+	private ArrayList<Duration> durations = new ArrayList<Duration>();
 	
 	/**
 	 * @gwt.typeArgs <com.mambu.xbrl.shared.XBRLElement,java.lang.String>
 	 */
 	@Persistent(serialized = "true", defaultFetchGroup = "true")
-	public HashMap<XBRLElement, String> values = new HashMap<XBRLElement, String>();
+	private HashMap<XBRLElement, String> values = new HashMap<XBRLElement, String>();
 
-	public XBRLGenerationParameters() {
+	public TenantSettings() {
 
 	}
 
-	public String getDomain() {
-		return domain;
-	}
-
-	public void setDomain(String domain) {
-		this.domain = domain;
-	}
 
 	public String getUsername() {
 		return username;
@@ -92,6 +93,36 @@ public class XBRLGenerationParameters implements Serializable {
 
 	public String getEncodedKey() {
 		return encodedKey;
+	}
+
+
+	public void setTenantID(String tenantID) {
+		this.tenantID = tenantID;
+	}
+
+
+	public String getTenantID() {
+		return tenantID;
+	}
+
+
+	public void setAppKey(String appKey) {
+		this.appKey = appKey;
+	}
+
+
+	public String getAppKey() {
+		return appKey;
+	}
+
+
+	public void setDomain(String domain) {
+		this.domain = domain;
+	}
+
+
+	public String getDomain() {
+		return domain;
 	}
 
 }

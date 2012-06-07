@@ -9,11 +9,12 @@ import com.mambu.xbrl.client.view.XBRLCreatorView;
  */
 public class MambuXBRL implements EntryPoint {
 
-
+	
 	/**
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
+		
 		RootLayoutPanel rootLayoutPanel = RootLayoutPanel.get();
 		rootLayoutPanel.clear();
 		rootLayoutPanel.add(new XBRLCreatorView());

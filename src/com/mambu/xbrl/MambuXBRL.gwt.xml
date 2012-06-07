@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module rename-to='mambuxbrl'>
   <!-- Inherit the core Web Toolkit stuff.                        -->
+  <inherits name="lovely.gwt.jsonrpc.JsonRpc" />
   <inherits name='com.google.gwt.user.User'/>
-
+  <inherits name="com.google.gwt.core.Core" />
+  <add-linker name="xsiframe" />
+  
   <!-- Inherit the default GWT style sheet.  You can change       -->
   <!-- the theme of your GWT application by uncommenting          -->
   <!-- any one of the following lines.                            -->
@@ -13,6 +16,7 @@
 
   <!-- Other module inherits                                      -->
 
+  
   <!-- Specify the app entry point class.                         -->
   <entry-point class='com.mambu.xbrl.client.MambuXBRL'/>
 

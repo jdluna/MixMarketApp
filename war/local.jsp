@@ -1,3 +1,16 @@
+
+<%
+   
+	String tenantID = request.getParameter("TENANT_ID");
+
+	if (request.getParameter("TENANT_ID") == null) {
+        out.println("Please enter the tenantID.");
+    } else {
+		session.setAttribute("TENANT_ID", tenantID);
+    }
+
+%>
+
 <!doctype html>
 <!-- The DOCTYPE declaration above will set the     -->
 <!-- browser's rendering engine into                -->
@@ -24,6 +37,7 @@
     <!-- be added before this line.                -->
     <!--                                           -->
     <script type="text/javascript" language="javascript" src="mambuxbrl/mambuxbrl.nocache.js"></script>
+     	
   </head>
 
   <!--                                           -->

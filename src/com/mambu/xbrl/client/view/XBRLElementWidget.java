@@ -62,10 +62,6 @@ public class XBRLElementWidget extends Composite {
 	 */
 	XBRLElement element;
 
-	/**
-	 * The parent object which has the request settings
-	 */
-	HasRequestSettings requestController;
 
 	public XBRLElementWidget() {
 		initWidget(uiBinder.createAndBindUi(this));
@@ -109,11 +105,7 @@ public class XBRLElementWidget extends Composite {
 	 */
 	@UiHandler("value")
 	public void onKeyUp(KeyUpEvent event) {
-		//nothing to do if no controller
-		if (requestController == null) {
-			return;	
-		}
-		
+
 		//store the current expression
 		valueExpression = value.getValue();
 		
@@ -121,8 +113,7 @@ public class XBRLElementWidget extends Composite {
 			
 			loadingImage.setVisible(true);
 
-			
-			processService.processRequest(requestController.getRequestParams(), element, value.getValue(), new AsyncCallback<String>() {
+			processService.processRequest(element, value.getValue(), new AsyncCallback<String>() {
 
 				@Override
 				public void onSuccess(String result) {
@@ -159,14 +150,6 @@ public class XBRLElementWidget extends Composite {
 		value.setText(valueExpression);
 	}
 
-	/**
-	 * Sets the widget from which to retrieve the request settings
-	 * @param controller
-	 */
-	public void setRequestController(HasRequestSettings controller) {
-		this.requestController = controller;
-		
-	}
 
 	/**
 	 * Returns the XBRL element
