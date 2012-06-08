@@ -4,7 +4,7 @@
 	String tenantID = request.getParameter("TENANT_ID");
 
 	if (request.getParameter("TENANT_ID") == null) {
-        out.println("Please enter the tenantID.");
+        out.println("Please specify the tenantID.");
     } else {
 		session.setAttribute("TENANT_ID", tenantID);
     }

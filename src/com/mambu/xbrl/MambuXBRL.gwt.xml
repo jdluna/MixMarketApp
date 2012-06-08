@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module rename-to='mambuxbrl'>
   <!-- Inherit the core Web Toolkit stuff.                        -->
-  <inherits name="lovely.gwt.jsonrpc.JsonRpc" />
   <inherits name='com.google.gwt.user.User'/>
   <inherits name="com.google.gwt.core.Core" />
+   
+  
   <add-linker name="xsiframe" />
   
   <!-- Inherit the default GWT style sheet.  You can change       -->

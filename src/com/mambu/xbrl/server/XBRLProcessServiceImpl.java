@@ -66,27 +66,29 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 
 		String generatedXML = "";
 
+		XBRLGenerator xBRLGenerator = new XBRLGenerator();
+		xBRLGenerator.addLink();
+		xBRLGenerator.addContext(params.getDurations());
+		xBRLGenerator.addNumberUnit();
 		try {
-			XBRLGenerator xBRLGenerator = new XBRLGenerator();
-			xBRLGenerator.addLink();
-			xBRLGenerator.addContext(params.getDurations());
-			xBRLGenerator.addNumberUnit();
 			xBRLGenerator.addCurrencyUnit(mambu.getCurrency().getCode());
-
-			// now process the xbrl financial inputs
-			processXBRLFinancials(mambu, xBRLGenerator, params);
-			
-			//and process
-			processXBRLIndicators(mambu,xBRLGenerator);
-
-			generatedXML = xBRLGenerator.generate();
-
-		} catch (Exception e) {
+		} catch (MambuApiException e) {
 			e.printStackTrace();
-			throw new IllegalArgumentException(e.getMessage());
-
 		}
+
+		// now process the xbrl financial inputs
+		processXBRLFinancials(mambu, xBRLGenerator, params);
 		
+		//and process
+		try {
+			processXBRLIndicators(mambu,xBRLGenerator);
+		} catch (MambuApiException e) {
+			e.printStackTrace();
+		}
+
+		generatedXML = xBRLGenerator.generate();
+
+
 		return generatedXML;
 	}
 	
@@ -332,6 +334,8 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 	public TenantSettings getParams() {
 		
 		String tenantID = getTenantID();
+		log.info("got tenant: " + tenantID);
+		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		
 		try{
