@@ -1,5 +1,6 @@
 package com.mambu.xbrl.server;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -8,7 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.mambu.xbrl.server.util.ParamUtils;
+import com.mambu.xbrl.server.util.MambuRequestParser;
 import com.mambu.xbrl.shared.TenantSettings;
 
 public class InstallServlet extends HttpServlet {
@@ -21,12 +22,21 @@ public class InstallServlet extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp) {
 
+		MambuRequestParser parser = new MambuRequestParser(req);
+		
+		//check if is valid
+		log.info("Is valid request: " + parser.isValidRequest(Constants.SECRET_KEY));
+		
+		//TODO: don't do anything if not valid
+		
+		//now get the params
+		HashMap<String, String> payloadMap = parser.getPayloadMap();
+		
 		Map<String, String[]> params = req.getParameterMap();
-		String tenantID = ParamUtils.get("TENANT_ID", params);
-		String appKey = ParamUtils.get("APP_KEY", params);
-		String userName = ParamUtils.get("USERNAME", params);
-		String pword = ParamUtils.get("PASSWORD", params);
-		String hostname = ParamUtils.get("HOSTNAME", params);
+		String tenantID = payloadMap.get("TENANT_ID");
+		String userName = payloadMap.get("USERNAME");
+		String pword = payloadMap.get("PASSWORD");
+		String hostname = payloadMap.get("HOSTNAME");
 		
 		hostname = hostname == null ? req.getRemoteHost() : hostname; // hostname
 		
@@ -42,7 +52,6 @@ public class InstallServlet extends HttpServlet {
 		
 		try {
 			TenantSettings tenant = new TenantSettings();
-			tenant.setAppKey(appKey);
 			tenant.setTenantID(tenantID);
 			tenant.setUsername(userName);
 			tenant.setPassword(pword);

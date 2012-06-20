@@ -1,9 +1,16 @@
+<%@page import="com.mambu.xbrl.server.util.MambuRequestParser;" %>
+<%@page import="com.mambu.xbrl.server.Constants;" %>
 
 <%
    
-	String tenantID = request.getParameter("TENANT_ID");
+	MambuRequestParser parser = new MambuRequestParser(request);
 
-	if (request.getParameter("TENANT_ID") == null) {
+	//check if it's valid
+	out.print(parser.isValidRequest(Constants.SECRET_KEY));
+	
+	String tenantID = parser.getPayloadParam("TENANT_ID");
+
+	if (tenantID == null) {
         out.println("Please enter the tenantID.");
     } else {
 		session.setAttribute("TENANT_ID", tenantID);

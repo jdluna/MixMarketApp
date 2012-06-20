@@ -28,9 +28,6 @@ public class TenantSettings implements Serializable {
 	
 	@Persistent
 	private String domain;
-	
-	@Persistent
-	private String appKey;
 
 	@Persistent
 	private String username;
@@ -103,16 +100,6 @@ public class TenantSettings implements Serializable {
 
 	public String getTenantID() {
 		return tenantID;
-	}
-
-
-	public void setAppKey(String appKey) {
-		this.appKey = appKey;
-	}
-
-
-	public String getAppKey() {
-		return appKey;
 	}
 
 

@@ -1,5 +1,6 @@
 package com.mambu.xbrl.server;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -9,7 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.mambu.xbrl.server.util.ParamUtils;
+import com.mambu.xbrl.server.util.MambuRequestParser;
 import com.mambu.xbrl.shared.TenantSettings;
 
 public class UninstallServlet extends HttpServlet {
@@ -22,12 +23,21 @@ public class UninstallServlet extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest req, HttpServletResponse resp) {
 
+		MambuRequestParser parser = new MambuRequestParser(req);
+		
+		//check if is valid
+		log.info("Is valid request: " + parser.isValidRequest(Constants.SECRET_KEY));
+		
+		//TODO: don't do anything if not valid
+		
+		//now get the params
+		HashMap<String, String> payloadMap = parser.getPayloadMap();
+		
 		Map<String, String[]> params = req.getParameterMap();
-		String tenantID = ParamUtils.get("TENANT_ID", params);
-		String appKey = ParamUtils.get("APP_KEY", params);
+		String tenantID = payloadMap.get("TENANT_ID");
 				
 		//do some valiation
-		if (tenantID == null || appKey == null) {
+		if (tenantID == null) {
 			log.severe("Undeclared params" + params.toString());
 			return;
 		}
