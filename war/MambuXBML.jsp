@@ -1,4 +1,4 @@
-<%@page import="com.mambu.xbrl.server.util.MambuRequestParser;" %>
+<%@page import="com.mambu.xbrl.server.util.MambuRequestParser" %>
 <%@page import="com.mambu.xbrl.server.Constants;" %>
 
 <%
@@ -31,7 +31,7 @@
     <!--                                                               -->
     <!-- Consider inlining CSS to reduce the number of requested files -->
     <!--                                                               -->
-    <link type="text/css" rel="stylesheet" href="http://mixmarketapp.appspot.com/MambuXBML.css">
+    <link type="text/css" rel="stylesheet" href="MambuXBML.css">
 
     <!--                                           -->
     <!-- Any title is fine                         -->
@@ -43,7 +43,7 @@
     <!-- If you add any GWT meta tags, they must   -->
     <!-- be added before this line.                -->
     <!--                                           -->
-    <script type="text/javascript" language="javascript" src="http://mixmarketapp.appspot.com/mambuxbrl/mambuxbrl.nocache.js"></script>
+    <script type="text/javascript" language="javascript" src="mambuxbrl/mambuxbrl.nocache.js"></script>
      	
   </head>
 

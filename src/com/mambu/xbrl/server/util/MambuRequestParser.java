@@ -1,6 +1,8 @@
 package com.mambu.xbrl.server.util;
 
+import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -10,6 +12,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 public class MambuRequestParser {
 
@@ -22,22 +25,21 @@ public class MambuRequestParser {
 	private String payload;
 	private HashMap<String, String> payloadMap;
 
-	@SuppressWarnings("unchecked")
 	public MambuRequestParser(HttpServletRequest req) {
 		request = req.getParameter(SIGNED_REQUEST_PARAM);
 
 		// split the results
-		String[] split = request.split(".");
+		String[] split = request.split("\\.");
 
 		encodedSignature = split[0];
 		payload = split[1];
 
 		// decode the payload
-		byte[] decodedBase64 = Base64.decodeBase64(payload);
-		String stringdecoded = String.valueOf(decodedBase64);
+		String stringdecoded = new String(Base64.decodeBase64(payload));
 
 		// and store the resulting map
-		this.payloadMap = new Gson().fromJson(stringdecoded, HashMap.class);
+		Type mapType = new TypeToken<Map<String, String>>() {}.getType(); 
+		this.payloadMap = new Gson().fromJson(stringdecoded, mapType);
 	}
 
 	/**

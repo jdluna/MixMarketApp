@@ -15,3 +15,5 @@ war/.DS_Store
 war/WEB-INF/appengine-generated/local_db.bin
 
 .gwt/.gwt-log
+
+.gwt/.gwt-log
