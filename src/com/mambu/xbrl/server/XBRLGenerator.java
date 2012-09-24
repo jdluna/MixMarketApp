@@ -113,7 +113,10 @@ public class XBRLGenerator {
 		case INTEGER:
 			return numericUnit;
 		case MONEY:
-			return currencyUnit;	
+			return currencyUnit;
+		case STRING:
+		default:
+			break;	
 		}
 
 		return "";
