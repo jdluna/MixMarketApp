@@ -14,6 +14,13 @@ import org.apache.commons.codec.binary.Hex;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+/**
+ * Parses the signed requests out of Mambu and decodes with hmac. Using the
+ * secret key (constant), validates if the request was properly signed
+ * 
+ * @author edanilkis
+ * 
+ */
 public class MambuRequestParser {
 
 	public static final String HMAC_TYPE = "hmacSHA256";
@@ -38,7 +45,8 @@ public class MambuRequestParser {
 		String stringdecoded = new String(Base64.decodeBase64(payload));
 
 		// and store the resulting map
-		Type mapType = new TypeToken<Map<String, String>>() {}.getType(); 
+		Type mapType = new TypeToken<Map<String, String>>() {
+		}.getType();
 		this.payloadMap = new Gson().fromJson(stringdecoded, mapType);
 	}
 

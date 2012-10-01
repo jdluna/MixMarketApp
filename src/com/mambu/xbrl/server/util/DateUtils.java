@@ -1,4 +1,4 @@
-package com.mambu.xbrl.server;
+package com.mambu.xbrl.server.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

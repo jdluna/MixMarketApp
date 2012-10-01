@@ -11,8 +11,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.mambu.xbrl.server.util.MambuRequestParser;
+import com.mambu.xbrl.server.util.PMF;
 import com.mambu.xbrl.shared.TenantSettings;
 
+/**
+ * Uninstalls the app
+ * 
+ * @author edanilkis
+ * 
+ */
 public class UninstallServlet extends HttpServlet {
 
     private static final Logger log = Logger.getLogger(UninstallServlet.class.getName());
@@ -24,11 +31,12 @@ public class UninstallServlet extends HttpServlet {
 	public void doPost(HttpServletRequest req, HttpServletResponse resp) {
 
 		MambuRequestParser parser = new MambuRequestParser(req);
-		
-		//check if is valid
-		log.info("Is valid request: " + parser.isValidRequest(Constants.SECRET_KEY));
-		
-		//TODO: don't do anything if not valid
+
+		// check if is valid
+		if (!parser.isValidRequest(Constants.SECRET_KEY)) {
+			log.severe("Request is not valid: " + parser.isValidRequest(Constants.SECRET_KEY));
+			return;
+		}
 		
 		//now get the params
 		HashMap<String, String> payloadMap = parser.getPayloadMap();
@@ -36,7 +44,7 @@ public class UninstallServlet extends HttpServlet {
 		Map<String, String[]> params = req.getParameterMap();
 		String tenantID = payloadMap.get("TENANT_ID");
 				
-		//do some valiation
+		//do some validation
 		if (tenantID == null) {
 			log.severe("Undeclared params" + params.toString());
 			return;
@@ -53,7 +61,7 @@ public class UninstallServlet extends HttpServlet {
 			query.setUnique(true);
 			TenantSettings settings = (TenantSettings) query.execute(tenantID);
 			pm.deletePersistent(settings);
-			log.info("Deleted tenant " + tenantID);
+			log.info("Deleted tenant settings " + tenantID);
 			
 		} finally {
 			pm.close();

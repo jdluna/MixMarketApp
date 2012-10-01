@@ -13,23 +13,29 @@ import nu.xom.Element;
 import nu.xom.NodeFactory;
 import nu.xom.Serializer;
 
+import com.mambu.xbrl.server.util.DateUtils;
 import com.mambu.xbrl.shared.Duration;
 import com.mambu.xbrl.shared.Namespace;
 import com.mambu.xbrl.shared.XBRLElement;
 
+/**
+ * Generates the XBRL
+ * 
+ * @author edanilkis
+ * 
+ */
 public class XBRLGenerator {
 
-	
 	private String instantContextID;
-	
+
 	/**
 	 * Maps durations to context ids for this generation
 	 */
 	private HashMap<Duration, String> durationContextIDsMap = new HashMap<Duration, String>();
-	
+
 	private String currencyUnit;
 	private String numericUnit = "Number";
-	
+
 	// ID of the organization
 	private static String IDENTIFIER = "0000000";
 
@@ -62,7 +68,7 @@ public class XBRLGenerator {
 
 		root.appendChild(xmlElement);
 	}
-	
+
 	/**
 	 * Adds an XBRL Element to the sheet for a given instance
 	 * 
@@ -82,7 +88,7 @@ public class XBRLGenerator {
 
 		root.appendChild(xmlElement);
 	}
-	
+
 	/**
 	 * Adds an XBRL Element to the sheet for a given instance
 	 * 
@@ -116,7 +122,7 @@ public class XBRLGenerator {
 			return currencyUnit;
 		case STRING:
 		default:
-			break;	
+			break;
 		}
 
 		return "";
@@ -194,7 +200,6 @@ public class XBRLGenerator {
 		return root;
 
 	}
-	
 
 	/**
 	 * Adds the link
@@ -202,7 +207,8 @@ public class XBRLGenerator {
 	public void addLink() {
 
 		Element schemaRef = new Element("schemaRef");
-		schemaRef.addNamespaceDeclaration("link", "http://www.themix.org/sites/default/files/Taxonomy2010/dct/dc-all_2010-08-31.xsd");
+		schemaRef.addNamespaceDeclaration("link",
+				"http://www.themix.org/sites/default/files/Taxonomy2010/dct/dc-all_2010-08-31.xsd");
 		root.appendChild(schemaRef);
 	}
 
@@ -231,11 +237,10 @@ public class XBRLGenerator {
 		instant.appendChild(contextIdDate);
 		period.appendChild(instant);
 		context.appendChild(period);
-		
+
 		root.appendChild(context);
 
-		
-		//add the durations
+		// add the durations
 		for (Duration duration : durations) {
 			String durationIDFrom = DateUtils.format(duration.from);
 			String durationIDTo = DateUtils.format(duration.to);
@@ -243,8 +248,8 @@ public class XBRLGenerator {
 
 			Element durationContext = new Element("context");
 			durationContext.addAttribute(new Attribute("id", durationContextID));
-			
-			//add entity and identifier for the duration
+
+			// add entity and identifier for the duration
 			Element entity2 = new Element("entity");
 			durationContext.appendChild(entity2);
 
@@ -253,7 +258,7 @@ public class XBRLGenerator {
 			identifier2.appendChild(IDENTIFIER);
 			entity2.appendChild(identifier2);
 
-			//add the period
+			// add the period
 			Element durationPeriod = new Element("period");
 			Element startDate = new Element("startDate");
 			startDate.appendChild(durationIDFrom);
@@ -261,16 +266,15 @@ public class XBRLGenerator {
 			endDate.appendChild(durationIDTo);
 			durationPeriod.appendChild(startDate);
 			durationPeriod.appendChild(endDate);
-			
+
 			durationContext.appendChild(durationPeriod);
-			
-			//add to root
+
+			// add to root
 			root.appendChild(durationContext);
-			
-			//track the id
+
+			// track the id
 			this.durationContextIDsMap.put(duration, durationContextID);
 		}
-
 
 	}
 
@@ -279,6 +283,5 @@ public class XBRLGenerator {
 		int index = string.indexOf(".");
 		return index < 0 ? 0 : string.length() - index - 1;
 	}
-
 
 }

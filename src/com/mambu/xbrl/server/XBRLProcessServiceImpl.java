@@ -21,6 +21,8 @@ import com.mambu.apisdk.MambuAPIService;
 import com.mambu.apisdk.exception.MambuApiException;
 import com.mambu.intelligence.shared.model.Intelligence.Indicator;
 import com.mambu.xbrl.client.XBRLProcessService;
+import com.mambu.xbrl.server.util.DateUtils;
+import com.mambu.xbrl.server.util.PMF;
 import com.mambu.xbrl.shared.Duration;
 import com.mambu.xbrl.shared.IndicatorElementMap;
 import com.mambu.xbrl.shared.PeriodType;
@@ -33,12 +35,13 @@ import com.mambu.xbrl.shared.TenantSettings;
 @SuppressWarnings("serial")
 public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRLProcessService {
 
-    private static final Logger log = Logger.getLogger(XBRLProcessServiceImpl.class.getName());
+	private static final Logger log = Logger.getLogger(XBRLProcessServiceImpl.class.getName());
 
 	private static final ScriptEngine SCRIPT_ENGINE = new ScriptEngineManager().getEngineByName("JavaScript");
 
 	/**
 	 * Returns the tenant ID for this session
+	 * 
 	 * @return
 	 */
 	public String getTenantID() {
@@ -46,15 +49,16 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 		String tenantID = (String) request.getSession().getAttribute("TENANT_ID");
 		return tenantID;
 	}
+
 	/**
 	 * Generates the xml for a given connection with the specified inputs
 	 */
 	@Override
 	public String generateXML() {
 
-		//get the params
+		// get the params
 		TenantSettings params = getParams();
-		
+
 		MambuAPIService mambu;
 		try {
 			mambu = createService(params);
@@ -78,30 +82,28 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 
 		// now process the xbrl financial inputs
 		processXBRLFinancials(mambu, xBRLGenerator, params);
-		
-		//and process
+
+		// and process
 		try {
-			processXBRLIndicators(mambu,xBRLGenerator);
+			processXBRLIndicators(mambu, xBRLGenerator);
 		} catch (MambuApiException e) {
 			e.printStackTrace();
 		}
 
 		generatedXML = xBRLGenerator.generate();
 
-
 		return generatedXML;
 	}
-	
 
 	/**
 	 * Processses a single xbrml request
 	 */
-	
+
 	@Override
 	public String processRequest(XBRLElement element, String input) throws IllegalArgumentException {
 
 		TenantSettings params = getParams();
-		
+
 		MambuAPIService mambu = null;
 		try {
 			mambu = createService(params);
@@ -111,10 +113,10 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 		}
 
 		Duration duration = null;
-		if (element.getPeriod() ==  PeriodType.DURATION && params.getDurations().size() > 0) {
+		if (element.getPeriod() == PeriodType.DURATION && params.getDurations().size() > 0) {
 			duration = params.getDurations().get(0);
 		}
-		
+
 		BigDecimal processInputstring = processInputString(mambu, input, duration);
 
 		return processInputstring.stripTrailingZeros().toPlainString();
@@ -122,6 +124,7 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 
 	/**
 	 * Processes an individual input string
+	 * 
 	 * @param mambu
 	 * @param input
 	 * @return
@@ -150,7 +153,7 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 		// evaluate the expression
 		Float eval = 0f;
 		try {
-			Number value = (Number)SCRIPT_ENGINE.eval(oriString);
+			Number value = (Number) SCRIPT_ENGINE.eval(oriString);
 			eval = value.floatValue();
 		} catch (ScriptException e) {
 			e.printStackTrace();
@@ -165,20 +168,21 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 	 * 
 	 * @param mambu
 	 * @param glCode
-	 * @param duration TODO
+	 * @param duration
+	 *            TODO
 	 * @return
 	 * @throws MambuApiException
 	 */
-	private BigDecimal getAccountBalance(MambuAPIService mambu, String glCode, Duration duration) throws MambuApiException {
+	private BigDecimal getAccountBalance(MambuAPIService mambu, String glCode, Duration duration)
+			throws MambuApiException {
 
-		//get the account balance, with an optional date range
+		// get the account balance, with an optional date range
 		GLAccount glAccount;
-		if (duration == null) { 
+		if (duration == null) {
 			glAccount = mambu.getGLAccount(glCode);
 		} else {
 			glAccount = mambu.getGLAccount(glCode, DateUtils.format(duration.from), DateUtils.format(duration.to));
 		}
-			
 
 		return glAccount.getBalance();
 
@@ -224,10 +228,9 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 		return originalString.replaceAll("\\{" + glCode + "\\}", result.toString());
 	}
 
-
-
 	/**
 	 * Process the XBRL financial elements specified as parameters
+	 * 
 	 * @param mambu
 	 * @param xBRLGenerator
 	 * @param params
@@ -236,24 +239,23 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 		for (Entry<XBRLElement, String> entryValues : params.getValues().entrySet()) {
 
 			XBRLElement key = entryValues.getKey();
-			//skip empties
+			// skip empties
 			if (entryValues.getValue() == null || entryValues.getValue().isEmpty()) {
 				continue;
 			}
-			
-			
-			//if it's not a number
+
+			// if it's not a number
 			if (key.getPeriod() == null) {
 				xBRLGenerator.addElement(key, entryValues.getValue());
 				continue;
 			}
-			
-			//process the key based on it's period type
+
+			// process the key based on it's period type
 			switch (key.getPeriod()) {
 			case DURATION:
-				//go through all durations
+				// go through all durations
 				for (Duration durr : params.getDurations()) {
-					
+
 					BigDecimal processInputstring = processInputString(mambu, entryValues.getValue(), durr);
 
 					// add to the xml
@@ -261,21 +263,20 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 				}
 
 				break;
-				
-			//for instances processes it for just right now
+
+			// for instances processes it for just right now
 			case INSTANT:
 				BigDecimal processInputstring = processInputString(mambu, entryValues.getValue(), null);
 
 				// add to the xml
 				xBRLGenerator.addElement(key, processInputstring);
 				break;
-			
+
 			}
-			
 
 		}
 	}
-	
+
 	/**
 	 * Processes the indicators
 	 * 
@@ -312,35 +313,35 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 	 */
 	@Override
 	public TenantSettings storeParams(TenantSettings params) {
-		
+
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		
+
 		try {
 			params = pm.makePersistent(params);
 			params = pm.detachCopy(params);
-			
+
 		} finally {
 			pm.close();
 		}
-		
+
 		return params;
-		
+
 	}
 
 	/**
-	 * Retreives parameters
+	 * Retrieves parameters
 	 */
 	@Override
 	public TenantSettings getParams() {
-		
+
 		String tenantID = getTenantID();
 		log.info("got tenant: " + tenantID);
-		
+
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		
-		try{
-			
-			Query query = pm.newQuery(TenantSettings.class,"tenantID == tenantIDParam");
+
+		try {
+
+			Query query = pm.newQuery(TenantSettings.class, "tenantID == tenantIDParam");
 			query.declareParameters("String tenantIDParam");
 			query.setUnique(true);
 			TenantSettings settings = (TenantSettings) query.execute(tenantID);
@@ -350,13 +351,12 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 
 			log.info("Retreived params for " + tenantID);
 
-			return settings;	
-				
+			return settings;
+
 		} finally {
 			pm.close();
 
-		}		
+		}
 
-	
 	}
 }

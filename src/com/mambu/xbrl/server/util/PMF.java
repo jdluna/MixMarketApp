@@ -1,4 +1,4 @@
-package com.mambu.xbrl.server;
+package com.mambu.xbrl.server.util;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManagerFactory;
