@@ -4,10 +4,14 @@ Mambu XBRL Mix Market App
 The Mambu XBRL Mix Market App allow organizations to extract their financial and key indicators in the industry standard [XBRL](http://en.wikipedia.org/wiki/XBRL) format which can imported by [MixMarket](http://www.mixmarket.org/) or used in many industry-standard reporting tools. 
 
 Certain indicators such as number of clients, number of credit officers and so forth are automatically populated along with the currency used by the organization and the date range of the report.
-Usage
+
+Installation
 -----
 
-To use the Mambu XBRL Mix Market App, organizations must have APIs and Apps enabled on their account and need to [install](http://developer.mambu.com/api-apps-overview/app-installation) the app.
+To use the Mambu XBRL Mix Market App, organizations must have APIs and Apps enabled on their account and need to [install](http://developer.mambu.com/api-apps-overview/app-installation) the app using the following source location **https://dl.dropbox.com/u/6308256/Apps/mixmarket.xml**
+
+Usage
+-----
 
 Fields can be populated using either standard GL Codes or specific numbers. For instance when defining the "Cash And Cash Equivalents" field, any of the following combinations are possible
 - {52000} -> retrieve the balance from GL Account 52000
