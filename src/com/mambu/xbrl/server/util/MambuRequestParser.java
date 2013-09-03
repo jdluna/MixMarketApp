@@ -42,7 +42,7 @@ public class MambuRequestParser {
 		payload = split[1];
 
 		// decode the payload
-		String stringdecoded = new String(Base64.decodeBase64(payload));
+		String stringdecoded = new String(Base64.decodeBase64(payload.getBytes()));
 
 		// and store the resulting map
 		Type mapType = new TypeToken<Map<String, String>>() {

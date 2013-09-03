@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.mambu.accounting.shared.model.GLAccount;
 import com.mambu.apisdk.MambuAPIFactory;
-import com.mambu.apisdk.MambuAPIService;
 import com.mambu.apisdk.exception.MambuApiException;
 import com.mambu.intelligence.shared.model.Intelligence.Indicator;
 import com.mambu.xbrl.client.XBRLProcessService;
@@ -59,9 +58,8 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 		// get the params
 		TenantSettings params = getParams();
 
-		MambuAPIService mambu;
 		try {
-			mambu = createService(params);
+			MambuAPIFactory.setUp(params.getDomain(), params.getUsername(), params.getUsername());
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -75,17 +73,18 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 		xBRLGenerator.addContext(params.getDurations());
 		xBRLGenerator.addNumberUnit();
 		try {
-			xBRLGenerator.addCurrencyUnit(mambu.getCurrency().getCode());
+			
+			xBRLGenerator.addCurrencyUnit(MambuAPIFactory.getOrganizationService().getCurrency().getCode());
 		} catch (MambuApiException e) {
 			e.printStackTrace();
 		}
 
 		// now process the xbrl financial inputs
-		processXBRLFinancials(mambu, xBRLGenerator, params);
+		processXBRLFinancials(xBRLGenerator, params);
 
 		// and process
 		try {
-			processXBRLIndicators(mambu, xBRLGenerator);
+			processXBRLIndicators(xBRLGenerator);
 		} catch (MambuApiException e) {
 			e.printStackTrace();
 		}
@@ -104,9 +103,8 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 
 		TenantSettings params = getParams();
 
-		MambuAPIService mambu = null;
 		try {
-			mambu = createService(params);
+			MambuAPIFactory.setUp(params.getDomain(), params.getUsername(), params.getUsername());
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new IllegalArgumentException(e.getMessage());
@@ -117,19 +115,18 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 			duration = params.getDurations().get(0);
 		}
 
-		BigDecimal processInputstring = processInputString(mambu, input, duration);
+		BigDecimal processInputstring = processInputString(input, duration);
 
 		return processInputstring.stripTrailingZeros().toPlainString();
 	}
 
 	/**
 	 * Processes an individual input string
-	 * 
-	 * @param mambu
 	 * @param input
+	 * 
 	 * @return
 	 */
-	private BigDecimal processInputString(MambuAPIService mambu, String input, Duration duration) {
+	private BigDecimal processInputString(String input, Duration duration) {
 		String oriString = new String(input);
 
 		// parse input
@@ -139,7 +136,7 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 			// get the balance
 			BigDecimal accountBalance;
 			try {
-				accountBalance = getAccountBalance(mambu, glCode, duration);
+				accountBalance = getAccountBalance(glCode, duration);
 			} catch (MambuApiException e) {
 				log.severe(e.getErrorMessage());
 				throw new IllegalArgumentException(e.getErrorMessage());
@@ -165,23 +162,21 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 
 	/**
 	 * Gets the balance of a givent account
-	 * 
-	 * @param mambu
 	 * @param glCode
 	 * @param duration
-	 *            TODO
+	 * 
 	 * @return
 	 * @throws MambuApiException
 	 */
-	private BigDecimal getAccountBalance(MambuAPIService mambu, String glCode, Duration duration)
+	private BigDecimal getAccountBalance(String glCode, Duration duration)
 			throws MambuApiException {
 
 		// get the account balance, with an optional date range
 		GLAccount glAccount;
 		if (duration == null) {
-			glAccount = mambu.getGLAccount(glCode);
+			glAccount = MambuAPIFactory.getAccountingService().getGLAccount(glCode);
 		} else {
-			glAccount = mambu.getGLAccount(glCode, DateUtils.format(duration.from), DateUtils.format(duration.to));
+			glAccount = MambuAPIFactory.getAccountingService().getGLAccount(glCode, DateUtils.format(duration.from), DateUtils.format(duration.to));
 		}
 
 		return glAccount.getBalance();
@@ -230,12 +225,10 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 
 	/**
 	 * Process the XBRL financial elements specified as parameters
-	 * 
-	 * @param mambu
 	 * @param xBRLGenerator
 	 * @param params
 	 */
-	private void processXBRLFinancials(MambuAPIService mambu, XBRLGenerator xBRLGenerator, TenantSettings params) {
+	private void processXBRLFinancials(XBRLGenerator xBRLGenerator, TenantSettings params) {
 		for (Entry<XBRLElement, String> entryValues : params.getValues().entrySet()) {
 
 			XBRLElement key = entryValues.getKey();
@@ -256,7 +249,7 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 				// go through all durations
 				for (Duration durr : params.getDurations()) {
 
-					BigDecimal processInputstring = processInputString(mambu, entryValues.getValue(), durr);
+					BigDecimal processInputstring = processInputString(entryValues.getValue(), durr);
 
 					// add to the xml
 					xBRLGenerator.addElement(key, processInputstring, durr);
@@ -266,7 +259,7 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 
 			// for instances processes it for just right now
 			case INSTANT:
-				BigDecimal processInputstring = processInputString(mambu, entryValues.getValue(), null);
+				BigDecimal processInputstring = processInputString(entryValues.getValue(), null);
 
 				// add to the xml
 				xBRLGenerator.addElement(key, processInputstring);
@@ -279,34 +272,21 @@ public class XBRLProcessServiceImpl extends RemoteServiceServlet implements XBRL
 
 	/**
 	 * Processes the indicators
-	 * 
-	 * @param mambu
 	 * @param xBRLGenerator
+	 * 
 	 * @throws MambuApiException
 	 */
-	private void processXBRLIndicators(MambuAPIService mambu, XBRLGenerator xBRLGenerator) throws MambuApiException {
+	private void processXBRLIndicators(XBRLGenerator xBRLGenerator) throws MambuApiException {
 
 		// go through the map
 		for (Entry<Indicator, XBRLElement> entries : IndicatorElementMap.getMap().entrySet()) {
 
-			BigDecimal indicatorValue = mambu.getIndicator(entries.getKey());
+			BigDecimal indicatorValue = MambuAPIFactory.getIntelligenceService().getIndicator(entries.getKey());
 
 			xBRLGenerator.addElement(entries.getValue(), indicatorValue);
 		}
 	}
 
-	/**
-	 * Creates the API Service from the request settings
-	 * 
-	 * @param settings
-	 * @return
-	 * @throws MambuApiException
-	 */
-	private MambuAPIService createService(TenantSettings settings) throws MambuApiException {
-		MambuAPIService mambu = MambuAPIFactory.crateService(settings.getUsername(), settings.getPassword(), settings.getDomain());
-		mambu.setProtocol("http");
-		return mambu;
-	}
 
 	/**
 	 * Stores parameters
